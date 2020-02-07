@@ -1,15 +1,38 @@
 # Copyright (c) Microsoft. All rights reserved.
 # Licensed under the MIT license. See LICENSE file in the project root for full license information.
+Function GetWindowsOSEdition()
+{
+    # Use reg key HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\EditionID to tell different Windows editions apart - "IoTUAP" is Windows IoT Core
+    if ([Environment]::OSVersion.Platform -eq [System.PlatformID]::Win32NT) 
+	{
+		return (Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion').EditionID
+	}
+    return null
+}
+
 Function IsWindows() 
 {
 	return ([Environment]::OSVersion.Platform -eq [System.PlatformID]::Win32NT)
 }
 
-if (isWindows) 
+if (IsWindows)
 {
-	Write-Host Start ETL logging
-	logman create trace IotTrace -o iot.etl -pf tools/CaptureLogs/iot_providers.txt
-	logman start IotTrace
+	# For Windows IoT Core logging, the list of provider GUIDs (iot_providers.txt) needs to be converted to a format compatible with the tracing tool.
+	if (GetWindowsOSEdition -eq "IoTUAP") 
+	{
+		Write-Host Start ETL logging
+		
+		tracelog -stop IotTrace
+		for /F "eol=; tokens=2 delims={}" %%i in (tools\CaptureLogs\iot_providers.txt) do @echo %%i;0xffffffffffffffff;0xff >> tools\CaptureLogs\iot_providers_temp.txt
+		tracelog -start IotTrace -f iot.etl -guid tools\CaptureLogs\iot_providers_temp.txt
+		del tools\CaptureLogs\iot_providers_temp.txt
+	} 
+	else 
+	{
+		Write-Host Start ETL logging
+		logman create trace IotTrace -o iot.etl -pf tools/CaptureLogs/iot_providers.txt
+		logman start IotTrace
+	}
 }
 
 Write-Host List active docker containers
@@ -48,7 +71,7 @@ else
 {
 	#Likely a nightly or CI build
 	Write-Host "Not a pull request build, will run all tests"
-	$runTestCmd += " -e2etests"	
+	$runTestCmd += " -unittests -e2etests"	
 }
 
 
