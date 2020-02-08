@@ -3,11 +3,11 @@
 Function GetWindowsOSEdition()
 {
     # Use reg key HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\EditionID to tell different Windows editions apart - "IoTUAP" is Windows IoT Core
-    if ([Environment]::OSVersion.Platform -eq [System.PlatformID]::Win32NT) 
+    if (IsWindows) 
 	{
 		return (Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion').EditionID
 	}
-    return null
+    return $null
 }
 
 Function IsWindows() 
@@ -84,9 +84,18 @@ $gateFailed = $LASTEXITCODE
 
 if (isWindows) 
 {
-	Write-Host Stop ETL logging
-	logman stop IotTrace
-	logman delete IotTrace
+	if (GetWindowsOSEdition -eq "IoTUAP") 
+	{
+		Write-Host Stop ETL logging
+		tracelog -flush IotTrace
+		tracelog -stop IotTrace
+	} 
+	else
+	{
+		Write-Host Stop ETL logging
+		logman stop IotTrace
+		logman delete IotTrace
+	}
 }
 
 if ($gateFailed) 
