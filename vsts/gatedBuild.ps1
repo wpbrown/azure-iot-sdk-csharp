@@ -20,12 +20,12 @@ if (IsWindows)
 	# For Windows IoT Core logging, the list of provider GUIDs (iot_providers.txt) needs to be converted to a format compatible with the tracing tool.
 	if (GetWindowsOSEdition -eq "IoTUAP") 
 	{
-		Write-Host Start ETL logging
+		Write-Host Start ETL logging - TODO
 		
-		tracelog -stop IotTrace
-		for /F "eol=; tokens=2 delims={}" %%i in (tools\CaptureLogs\iot_providers.txt) do @echo %%i;0xffffffffffffffff;0xff >> tools\CaptureLogs\iot_providers_temp.txt
-		tracelog -start IotTrace -f iot.etl -guid tools\CaptureLogs\iot_providers_temp.txt
-		del tools\CaptureLogs\iot_providers_temp.txt
+		# tracelog -stop IotTrace
+		# for /F "eol=; tokens=2 delims={}" %%i in (tools\CaptureLogs\iot_providers.txt) do @echo %%i;0xffffffffffffffff;0xff >> tools\CaptureLogs\iot_providers_temp.txt
+		# tracelog -start IotTrace -f iot.etl -guid tools\CaptureLogs\iot_providers_temp.txt
+		# del tools\CaptureLogs\iot_providers_temp.txt
 	} 
 	else 
 	{
@@ -86,9 +86,9 @@ if (isWindows)
 {
 	if (GetWindowsOSEdition -eq "IoTUAP") 
 	{
-		Write-Host Stop ETL logging
-		tracelog -flush IotTrace
-		tracelog -stop IotTrace
+		Write-Host Stop ETL logging - TODO
+		# tracelog -flush IotTrace
+		# tracelog -stop IotTrace
 	} 
 	else
 	{
