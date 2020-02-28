@@ -3,25 +3,21 @@
 Function GetWindowsOSEdition()
 {
     # Use reg key HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\EditionID to tell different Windows editions apart - "IoTUAP" is Windows IoT Core
-    if (IsWindows) 
-	{
-		return (Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion').EditionID
-	}
-    return $null
+    return (Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion').EditionID
 }
 
-Function IsWindows() 
+# The $IsLinux, $IsWindows commands are available only on powershell v6 onwards.
+# Currently, only the Ubuntu 16.04 agent has powershell v6 installed, the windows vs2017 images have powershell v5 installed, where these commands return null.
+# So for windows image on VSTS, $IsWindows can either be true (powershell v6+), or null (powershell v5).
+if ($IsWindows -ne $false)
 {
-	return ([Environment]::OSVersion.Platform -eq [System.PlatformID]::Win32NT)
-}
+	$edition = GetWindowsOSEdition
 
-if (IsWindows)
-{
 	# For Windows IoT Core logging, the list of provider GUIDs (iot_providers.txt) needs to be converted to a format compatible with the tracing tool.
-	if (GetWindowsOSEdition -eq "IoTUAP") 
+	if ($edition -eq "IoTUAP") 
 	{
 		Write-Host Start ETL logging - TODO
-		
+
 		# tracelog -stop IotTrace
 		# for /F "eol=; tokens=2 delims={}" %%i in (tools\CaptureLogs\iot_providers.txt) do @echo %%i;0xffffffffffffffff;0xff >> tools\CaptureLogs\iot_providers_temp.txt
 		# tracelog -start IotTrace -f iot.etl -guid tools\CaptureLogs\iot_providers_temp.txt
@@ -30,13 +26,11 @@ if (IsWindows)
 	else 
 	{
 		Write-Host Start ETL logging
+
 		logman create trace IotTrace -o iot.etl -pf tools/CaptureLogs/iot_providers.txt
 		logman start IotTrace
 	}
 }
-
-Write-Host List active docker containers
-docker ps -a
 
 #Load functions used to check what, if any, e2e tests should be run
 . .\vsts\determine_tests_to_run.ps1
@@ -82,7 +76,7 @@ Invoke-Expression $runTestCmd
 
 $gateFailed = $LASTEXITCODE
 
-if (isWindows) 
+if ($IsWindows -ne $false) 
 {
 	if (GetWindowsOSEdition -eq "IoTUAP") 
 	{
