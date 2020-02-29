@@ -71,6 +71,8 @@ else
 
 Write-Host "Starting tests..."
 
+Write-Host "Running: $runTestCmd"
+
 # Run the build.ps1 script with the above parameters
 Invoke-Expression $runTestCmd
 
