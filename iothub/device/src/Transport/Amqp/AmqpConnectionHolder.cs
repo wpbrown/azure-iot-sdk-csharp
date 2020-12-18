@@ -9,6 +9,7 @@ using Microsoft.Azure.Devices.Client.Exceptions;
 using Microsoft.Azure.Devices.Client.Extensions;
 using Microsoft.Azure.Devices.Client.Transport.AmqpIoT;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Microsoft.Azure.Devices.Client.Transport.Amqp
 {
@@ -22,6 +23,7 @@ namespace Microsoft.Azure.Devices.Client.Transport.Amqp
         private AmqpIoTConnection _amqpIoTConnection;
         private IAmqpAuthenticationRefresher _amqpAuthenticationRefresher;
         private volatile bool _disposed;
+        private readonly HashSet<Task> _closeWaits = new HashSet<Task>();
 
         public AmqpConnectionHolder(DeviceIdentity deviceIdentity)
         {
@@ -257,10 +259,17 @@ namespace Microsoft.Azure.Devices.Client.Transport.Amqp
 
             lock (_unitsLock)
             {
+                // When we remove a unit it should be considered completely done.
+                var closeTask = amqpUnit
+                    .CloseAsync(TimeSpan.FromSeconds(30))
+                    .ContinueWith(task => { _closeWaits.Remove(task); }, TaskScheduler.Default);
+                _closeWaits.Add(closeTask);
+                
                 _amqpUnits.Remove(amqpUnit);
                 if (_amqpUnits.Count == 0)
                 {
-                    // TODO #887: handle gracefulDisconnect
+                    // Wait for any remaining tasks to complete
+                    Task.WaitAll(_closeWaits.ToArray());
                     Shutdown();
                 }
             }
