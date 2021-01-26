@@ -30,7 +30,7 @@ namespace Microsoft.Azure.Devices.Client
         private const string GatewayHostNamePropertyName = "GatewayHostName";
         private const string X509CertPropertyName = "X509Cert";
 
-        private const RegexOptions CommonRegexOptions = RegexOptions.Compiled | RegexOptions.IgnoreCase;
+        private const RegexOptions CommonRegexOptions = RegexOptions.Compiled | RegexOptions.IgnoreCase | RegexOptions.CultureInvariant;
         private static readonly TimeSpan s_regexTimeoutMilliseconds = TimeSpan.FromMilliseconds(500);
         private static readonly Regex s_hostNameRegex = new Regex(@"[a-zA-Z0-9_\-\.]+$", CommonRegexOptions, s_regexTimeoutMilliseconds);
         private static readonly Regex s_idNameRegex = new Regex(@"^[A-Za-z0-9\-:.+%_#*?!(),=@;$']{1,128}$", CommonRegexOptions, s_regexTimeoutMilliseconds);
@@ -181,7 +181,11 @@ namespace Microsoft.Azure.Devices.Client
 
         internal string IotHubName { get; private set; }
 
+        // Device certificate
         internal X509Certificate2 Certificate { get; set; }
+
+        /// Full chain of certificates from the one used to sign the device certificate to the one uploaded to the service.
+        internal X509Certificate2Collection ChainCertificates { get; set; }
 
         internal IotHubConnectionString ToIotHubConnectionString()
         {
