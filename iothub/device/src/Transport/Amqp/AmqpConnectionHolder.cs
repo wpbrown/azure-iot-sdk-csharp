@@ -129,13 +129,24 @@ namespace Microsoft.Azure.Devices.Client.Transport.Amqp
 
             if (disposing)
             {
+                lock (_unitsLock)
+                {
+                    foreach (var amqpUnit in _amqpUnits)
+                    {
+                        // Unlike the RemoveAmqpUnit method we don't want to block during dispose 
+                        // as somehow somewhere someone may add this as a part of a finalize by mistake
+                        // Instead we should do a best effort close to release the sockets
+                        var closeTask = amqpUnit?
+                        .CloseAsync(TimeSpan.FromSeconds(30))
+                        .ContinueWith(task => { _closeWaits.Remove(task); }, TaskScheduler.Default);
+                        _closeWaits.Add(closeTask);
+                    }
+                    _amqpUnits.Clear();
+                }
                 _amqpIoTConnection?.SafeClose();
                 _lock?.Dispose();
                 _amqpIoTConnector?.Dispose();
-                lock (_unitsLock)
-                {
-                    _amqpUnits.Clear();
-                }
+                
                 _amqpAuthenticationRefresher?.Dispose();
             }
 
@@ -260,7 +271,7 @@ namespace Microsoft.Azure.Devices.Client.Transport.Amqp
             lock (_unitsLock)
             {
                 // When we remove a unit it should be considered completely done.
-                var closeTask = amqpUnit
+                var closeTask = amqpUnit?
                     .CloseAsync(TimeSpan.FromSeconds(30))
                     .ContinueWith(task => { _closeWaits.Remove(task); }, TaskScheduler.Default);
                 _closeWaits.Add(closeTask);
