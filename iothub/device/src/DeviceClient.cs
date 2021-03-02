@@ -680,5 +680,146 @@ namespace Microsoft.Azure.Devices.Client
         /// <exception cref="OperationCanceledException">Thrown when the operation has been canceled.</exception>
         public Task UpdateReportedPropertiesAsync(TwinCollection reportedProperties, CancellationToken cancellationToken) =>
             InternalClient.UpdateReportedPropertiesAsync(reportedProperties, cancellationToken);
+
+        /// <summary>
+        /// Update all properties in the collection.
+        /// </summary>
+        /// <param name="properties">Reported properties to push</param>
+        /// <param name="cts"></param>
+        public Task UpdatePropertiesAsync(IDictionary<string, Property<ISerializableSchema>> properties, CancellationToken cts = default) => InternalClient.UpdatePropertiesAsync(properties, cts);
+
+        /// <summary>
+        /// Update all properties in the collection for the specified component
+        /// </summary>
+        /// <param name="componentName"></param>
+        /// <param name="properties">Reported properties to push</param>
+        /// <param name="cts"></param>
+        public Task UpdatePropertiesAsync(string componentName, IDictionary<string, Property<ISerializableSchema>> properties, CancellationToken cts = default) => InternalClient.UpdatePropertiesAsync(componentName, properties, cts);
+
+        /// <summary>
+        /// Update a single property.
+        /// </summary>
+        /// <param name="propertyName"></param>
+        /// <param name="propertyValue"></param>
+        /// <param name="cts"></param>
+        public Task UpdatePropertyAsync(string propertyName, Property<ISerializableSchema> propertyValue, CancellationToken cts = default) => InternalClient.UpdatePropertyAsync(propertyName, propertyValue, cts);
+
+        /// <summary>
+        /// Update a single property for the specified component.
+        /// </summary>
+        /// <param name="componentName"></param>
+        /// <param name="propertyName"></param>
+        /// <param name="propertyValue"></param>
+        /// <param name="cts"></param>
+        public Task UpdatePropertyAsync(string componentName, string propertyName, Property<ISerializableSchema> propertyValue, CancellationToken cts = default) => InternalClient.UpdatePropertyAsync(componentName, propertyName, propertyValue, cts);
+
+        /// <summary>
+        /// Respond to a writable property request.
+        /// </summary>
+        /// <param name="propertyName"></param>
+        /// <param name="propertyValue"></param>
+        /// <param name="cts"></param>
+        public Task UpdatePropertyAsync(string propertyName, WritableProperty propertyValue, CancellationToken cts = default) => InternalClient.UpdatePropertyAsync(propertyName, propertyValue, cts);
+
+
+        /// <summary>
+        /// Respond to a writable property request for the specified component
+        /// </summary>
+        /// <param name="componentName"></param>
+        /// <param name="propertyName"></param>
+        /// <param name="propertyValue"></param>
+        /// <param name="cts"></param>
+        public Task UpdatePropertyAsync(string componentName, string propertyName, WritableProperty propertyValue, CancellationToken cts = default) => InternalClient.UpdatePropertyAsync(componentName, propertyName, propertyValue, cts);
+
+        /// <summary>
+        /// Set the writable property callback for the specified component.
+        /// </summary>
+        /// <param name="componentName"></param>
+        /// <param name="propertyName"></param>
+        /// <param name="propertyAction"></param>
+        public void SetWritablePropertyEvent(string componentName, string propertyName, Action<string, string, WritableProperty> propertyAction) => InternalClient.SetWritablePropertyEvent(componentName, propertyName, propertyAction);
+
+        /// <summary>
+        /// Set the writable property callback.
+        /// </summary>
+        /// <param name="propertyName"></param>
+        /// <param name="propertyAction"></param>
+        public void SetWritablePropertyEvent(string propertyName, Action<string, string, WritableProperty> propertyAction) => InternalClient.SetWritablePropertyEvent(propertyName, propertyAction);
+
+        /// <summary>
+        /// Send a single instance of telemetry.
+        /// </summary>
+        /// <param name="telemetryName"></param>
+        /// <param name="telemetryValue"></param>
+        /// <param name="cts"></param>
+        public Task SendTelemetryAsync(string telemetryName, Property<ISerializableSchema> telemetryValue, CancellationToken cts = default) => InternalClient.SendTelemetryAsync(telemetryName, telemetryValue, cts);
+
+        /// <summary>
+        /// Send a single instance of telemetry for the specified component.
+        /// </summary>
+        /// <param name="componentName"></param>
+        /// <param name="telemetryName"></param>
+        /// <param name="telemetryValue"></param>
+        /// <param name="cts"></param>
+        public Task SendTelemetryAsync(string componentName, string telemetryName, Property<ISerializableSchema> telemetryValue, CancellationToken cts = default) => InternalClient.SendTelemetryAsync(componentName, telemetryName, telemetryValue, cts);
+
+        /// <summary>
+        /// Push reported property changes up to the service.
+        /// </summary>
+        /// <param name="telemetryDictionary"></param>
+        /// <param name="cts"></param>
+        public Task SendTelemetryAsync(IDictionary<string, Property<ISerializableSchema>> telemetryDictionary, CancellationToken cts = default) => InternalClient.SendTelemetryAsync(telemetryDictionary, cts);
+
+        /// <summary>
+        /// Push reported property changes up to the service.
+        /// </summary>
+        /// <param name="componentName"></param>
+        /// <param name="telemetryDictionary"></param>
+        /// <param name="cts"></param>
+        public Task SendTelemetryAsync(string componentName, IDictionary<string, Property<ISerializableSchema>> telemetryDictionary, CancellationToken cts = default) => InternalClient.SendTelemetryAsync(componentName, telemetryDictionary, cts);
+
+        /// <summary>
+        /// Push reported property changes up to the service.
+        /// </summary>
+        /// <param name="componentName"></param>
+        /// <param name="commandName"></param>
+        /// <param name="command"></param>
+        /// <param name="cts"></param>
+        public Task<TResponse> SendCommandAsync<TRequest, TResponse>(string componentName, string commandName, Command<TRequest, TResponse> command, CancellationToken cts = default)
+            where TRequest : ISerializableSchema<TRequest>
+            where TResponse : ISerializableSchema<TResponse>
+            => InternalClient.SendCommandAsync(componentName, commandName, command, cts);
+
+        /// <summary>
+        /// Push reported property changes up to the service.
+        /// </summary>
+        /// <param name="commandName"></param>
+        /// <param name="command"></param>
+        /// <param name="cts"></param>
+        public Task<TResponse> SendCommandAsync<TRequest, TResponse>(string commandName, Command<TRequest, TResponse> command, CancellationToken cts = default)
+            where TRequest : ISerializableSchema<TRequest>
+            where TResponse : ISerializableSchema<TResponse> => InternalClient.SendCommandAsync(commandName, command, cts);
+
+        /// <summary>
+        /// Push reported property changes up to the service.
+        /// </summary>
+        /// <param name="componentName"></param>
+        /// <param name="commandName"></param>
+        /// <param name="command"></param>
+        /// <param name="commandCallback"></param>
+        public void SetCommandCallback<TRequest, TResponse>(string componentName, string commandName, Command<TRequest, TResponse> command, Action<string, string, Command<TRequest, TResponse>> commandCallback)
+            where TRequest : ISerializableSchema<TRequest>
+            where TResponse : ISerializableSchema<TResponse>
+            => InternalClient.SetCommandCallback(componentName, commandName, command, commandCallback);
+
+        /// <summary>
+        /// Push reported property changes up to the service.
+        /// </summary>
+        /// <param name="commandName"></param>
+        /// <param name="command"></param>
+        /// <param name="commandCallback"></param>
+        public void SetCommndCallback<TRequest, TResponse>(string commandName, Command<TRequest, TResponse> command, Action<string, Command<TRequest, TResponse>> commandCallback)
+            where TRequest : ISerializableSchema<TRequest>
+            where TResponse : ISerializableSchema<TResponse> => InternalClient.SetCommandCallback(commandName, command, commandCallback);
     }
 }

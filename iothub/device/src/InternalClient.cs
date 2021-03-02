@@ -12,6 +12,7 @@ using Microsoft.Azure.Devices.Shared;
 using System.Security.Cryptography.X509Certificates;
 using System.IO;
 using Microsoft.Azure.Devices.Client.Exceptions;
+using System.Text;
 
 #if NET451
 
@@ -745,6 +746,33 @@ namespace Microsoft.Azure.Devices.Client
         /// <param name="methodHandler">The delegate to be used when a method with the given name is called by the cloud service.</param>
         /// <param name="userContext">generic parameter to be interpreted by the client code.</param>
         /// </summary>
+        public Task SetCommandHandlerAsync(string methodName, MethodCallback methodHandler, object userContext)
+        {
+            return this.SetMethodHandlerAsync(methodName, methodHandler, userContext);
+        }
+
+        /// <summary>
+        /// Sets a new delegate for the named method. If a delegate is already associated with
+        /// the named method, it will be replaced with the new delegate.
+        /// A method handler can be unset by passing a null MethodCallback.
+        /// <param name="componentName">Name of the component to send the properties for</param>
+        /// <param name="methodName">The name of the method to associate with the delegate.</param>
+        /// <param name="methodHandler">The delegate to be used when a method with the given name is called by the cloud service.</param>
+        /// <param name="userContext">generic parameter to be interpreted by the client code.</param>
+        /// </summary>
+        public Task SetCommandHandlerAsync(string componentName, string methodName, MethodCallback methodHandler, object userContext)
+        {
+            return this.SetMethodHandlerAsync($"{componentName}*{methodName}", methodHandler, userContext);
+        }
+
+        /// <summary>
+        /// Sets a new delegate for the named method. If a delegate is already associated with
+        /// the named method, it will be replaced with the new delegate.
+        /// A method handler can be unset by passing a null MethodCallback.
+        /// <param name="methodName">The name of the method to associate with the delegate.</param>
+        /// <param name="methodHandler">The delegate to be used when a method with the given name is called by the cloud service.</param>
+        /// <param name="userContext">generic parameter to be interpreted by the client code.</param>
+        /// </summary>
         public async Task SetMethodHandlerAsync(string methodName, MethodCallback methodHandler, object userContext)
         {
             try
@@ -927,6 +955,31 @@ namespace Microsoft.Azure.Devices.Client
             }
         }
 
+        internal Task UpdatePropertiesAsync(IDictionary<string, Property<ISerializableSchema>> properties, CancellationToken cts)
+        {
+            throw new NotImplementedException();
+        }
+
+        internal Task UpdatePropertiesAsync(string componentName, IDictionary<string, Property<ISerializableSchema>> properties, CancellationToken cts = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        internal Task UpdatePropertyAsync(string propertyName, Property<ISerializableSchema> propertyValue, CancellationToken cts = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        internal Task UpdatePropertyAsync(string componentName, string propertyName, Property<ISerializableSchema> propertyValue, CancellationToken cts = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        internal Task UpdatePropertyAsync(string propertyName, WritableProperty propertyValue, CancellationToken cts = default)
+        {
+            throw new NotImplementedException();
+        }
+
         /// <summary>
         /// Sets a new delegate for the named method. If a delegate is already associated with
         /// the named method, it will be replaced with the new delegate.
@@ -955,6 +1008,31 @@ namespace Microsoft.Azure.Devices.Client
                     Logging.Exit(this, methodName, methodHandler, userContext, nameof(SetMethodHandler));
                 }
             }
+        }
+
+        internal Task UpdatePropertyAsync(string componentName, string propertyName, WritableProperty propertyValue, CancellationToken cts)
+        {
+            throw new NotImplementedException();
+        }
+
+        internal Task SetWritablePropertyEvent(string propertyName, Action<string, string, WritableProperty> propertyAction)
+        {
+            throw new NotImplementedException();
+        }
+
+        internal Task SendTelemetryAsync(string telemetryName, Property<ISerializableSchema> telemetryValue, CancellationToken cts = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        internal Task UpdateProperty(string componentName, string propertyName, WritableProperty propertyValue)
+        {
+            throw new NotImplementedException();
+        }
+
+        internal Task SendTelemetryAsync(string componentName, string telemetryName, Property<ISerializableSchema> telemetryValue, CancellationToken cts = default)
+        {
+            throw new NotImplementedException();
         }
 
         /// <summary>
@@ -1071,6 +1149,63 @@ namespace Microsoft.Azure.Devices.Client
             {
                 Logging.Exit(this, methodRequestInternal.Name, methodRequestInternal, nameof(OnMethodCalledAsync));
             }
+        }
+
+        internal Task<TResponse> SendCommandAsync<TRequest, TResponse>(string componentName, string commandName, Command<TRequest, TResponse> command, CancellationToken cts)
+            where TRequest : ISerializableSchema<TRequest>
+            where TResponse : ISerializableSchema<TResponse>
+        {
+            throw new NotImplementedException();
+        }
+
+        internal Task<TResponse> SendCommandAsync<TRequest, TResponse>(string commandName, Command<TRequest, TResponse> command, CancellationToken cts)
+            where TRequest : ISerializableSchema<TRequest>
+            where TResponse : ISerializableSchema<TResponse>
+        {
+            throw new NotImplementedException();
+        }
+
+        internal Task SendTelemetryAsync(string componentName, IDictionary<string, Property<ISerializableSchema>> telemetryDictionary, CancellationToken cts)
+        {
+            throw new NotImplementedException();
+        }
+
+        internal Task SendTelemetryAsync(IDictionary<string, Property<ISerializableSchema>> telemetryDictionary, CancellationToken cts)
+        {
+            throw new NotImplementedException();
+        }
+
+        internal Task SetCommandCallback<TRequest, TResponse>(string commandName, Command<TRequest, TResponse> command, Action<string, Command<TRequest, TResponse>> commandCallback)
+            where TRequest : ISerializableSchema<TRequest>
+            where TResponse : ISerializableSchema<TResponse>
+        {
+            throw new NotImplementedException();
+        }
+
+        internal Task SetCommandCallback<TRequest, TResponse>(string componentName, string commandName, Command<TRequest, TResponse> command, Action<string, string, Command<TRequest, TResponse>> commandCallback)
+            where TRequest : ISerializableSchema<TRequest>
+            where TResponse : ISerializableSchema<TResponse>
+        {
+            throw new NotImplementedException();
+        }
+
+        internal Task<TResponse> SendCommandAsync<TRequest, TResponse>(string commandName, Command<TRequest, TResponse> command)
+            where TRequest : ISerializableSchema<TRequest>
+            where TResponse : ISerializableSchema<TResponse>
+        {
+            throw new NotImplementedException();
+        }
+
+        internal Task<TResponse> SendCommandAsync<TRequest, TResponse>(string componentName, string commandName, Command<TRequest, TResponse> command)
+            where TRequest : ISerializableSchema<TRequest>
+            where TResponse : ISerializableSchema<TResponse>
+        {
+            throw new NotImplementedException();
+        }
+
+        internal Task SetWritablePropertyEvent(string componentName, string propertyName, Action<string, string, WritableProperty> propertyAction)
+        {
+            throw new NotImplementedException();
         }
 
         internal Task SendMethodResponseAsync(MethodResponseInternal methodResponse, CancellationToken cancellationToken)
@@ -1273,6 +1408,84 @@ namespace Microsoft.Azure.Devices.Client
                 cancellationToken.ThrowIfCancellationRequested();
                 throw;
             }
+        }
+
+        /// <summary>
+        /// Push reported component property changes up to the service.
+        /// </summary>
+        /// <param name="componentProperties">Reported properties to push to the service</param>
+        /// <param name="componentName">Name of the component to send the properties for</param>
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        public Task UpdateReportedPropertiesAsync(TwinCollection componentProperties, string componentName, CancellationToken cancellationToken)
+        {
+            
+            // Codes_SRS_DEVICECLIENT_18_006: `UpdateReportedPropertiesAsync` shall throw an `ArgumentNull` exception if `reportedProperties` is null
+            if (componentProperties == null)
+            {
+                throw new ArgumentNullException(nameof(componentProperties));
+            }
+
+            // Codes_SRS_DEVICECLIENT_18_002: `UpdateReportedPropertiesAsync` shall call `SendTwinPatchAsync` on the transport to update the reported properties
+            try
+            {
+                TwinCollection reportedProperties = new TwinCollection();
+                if (!componentProperties.Contains("__t"))
+                {
+                    componentProperties["__t"] = "c"; // marker to identify a component
+                }
+                reportedProperties[componentName] = componentProperties;
+                return this.UpdateReportedPropertiesAsync(reportedProperties, cancellationToken);
+            }
+            catch (IotHubCommunicationException ex) when (ex.InnerException is OperationCanceledException)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Sends the pre-serialized telemetry to the service with the default component
+        /// </summary>
+        /// <param name="serializedTelemetry">A string that contains the JSON serialized telemetry for the component</param>
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns></returns>
+        public Task SendTelemetryAsync(string serializedTelemetry, CancellationToken cancellationToken)
+        {
+            using var message = new Message(Encoding.UTF8.GetBytes(serializedTelemetry));
+            message.ContentType = "application/json";
+            message.ContentEncoding = "utf-8";
+            return this.SendEventAsync(message, cancellationToken);
+        }
+
+        /// <summary>
+        /// Sends the pre-serialized telemetry to the service
+        /// </summary>
+        /// <param name="componentName">Name of the component to send the properties for</param>
+        /// <param name="serializedTelemetry">A string that contains the JSON serialized telemetry for the component</param>
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns></returns>
+        public Task SendTelemetryAsync(string componentName, string serializedTelemetry, CancellationToken cancellationToken)
+        {
+            using var message = new Message(Encoding.UTF8.GetBytes(serializedTelemetry));
+            message.ComponentName = componentName;
+            message.ContentType = "application/json";
+            message.ContentEncoding = "utf-8";
+            return this.SendEventAsync(message, cancellationToken);
+        }
+
+        /// <summary>
+        /// Sends the pre-serialized telemetry to the service
+        /// </summary>
+        /// <param name="componentName">Name of the component to send the properties for</param>
+        /// <param name="telemetryMessage">A message that contains the telemetry to send</param>
+        /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
+        /// <returns></returns>
+        public Task SendTelemetryAsync(string componentName, Message telemetryMessage, CancellationToken cancellationToken)
+        {
+            telemetryMessage.ComponentName = componentName;
+            telemetryMessage.ContentType = "application/json";
+            telemetryMessage.ContentEncoding = "utf-8";
+            return this.SendEventAsync(telemetryMessage, cancellationToken);
         }
 
         //  Codes_SRS_DEVICECLIENT_18_005: When a patch is received from the service, the `callback` shall be called.
