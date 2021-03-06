@@ -955,31 +955,6 @@ namespace Microsoft.Azure.Devices.Client
             }
         }
 
-        internal Task UpdatePropertiesAsync(IDictionary<string, Property<ISerializableSchema>> properties, CancellationToken cts)
-        {
-            throw new NotImplementedException();
-        }
-
-        internal Task UpdatePropertiesAsync(string componentName, IDictionary<string, Property<ISerializableSchema>> properties, CancellationToken cts = default)
-        {
-            throw new NotImplementedException();
-        }
-
-        internal Task UpdatePropertyAsync(string propertyName, Property<ISerializableSchema> propertyValue, CancellationToken cts = default)
-        {
-            throw new NotImplementedException();
-        }
-
-        internal Task UpdatePropertyAsync(string componentName, string propertyName, Property<ISerializableSchema> propertyValue, CancellationToken cts = default)
-        {
-            throw new NotImplementedException();
-        }
-
-        internal Task UpdatePropertyAsync(string propertyName, WritableProperty propertyValue, CancellationToken cts = default)
-        {
-            throw new NotImplementedException();
-        }
-
         /// <summary>
         /// Sets a new delegate for the named method. If a delegate is already associated with
         /// the named method, it will be replaced with the new delegate.
@@ -1010,30 +985,6 @@ namespace Microsoft.Azure.Devices.Client
             }
         }
 
-        internal Task UpdatePropertyAsync(string componentName, string propertyName, WritableProperty propertyValue, CancellationToken cts)
-        {
-            throw new NotImplementedException();
-        }
-
-        internal Task SetWritablePropertyEvent(string propertyName, Action<string, string, WritableProperty> propertyAction)
-        {
-            throw new NotImplementedException();
-        }
-
-        internal Task SendTelemetryAsync(string telemetryName, Property<ISerializableSchema> telemetryValue, CancellationToken cts = default)
-        {
-            throw new NotImplementedException();
-        }
-
-        internal Task UpdateProperty(string componentName, string propertyName, WritableProperty propertyValue)
-        {
-            throw new NotImplementedException();
-        }
-
-        internal Task SendTelemetryAsync(string componentName, string telemetryName, Property<ISerializableSchema> telemetryValue, CancellationToken cts = default)
-        {
-            throw new NotImplementedException();
-        }
 
         /// <summary>
         /// The delegate for handling direct methods received from service.
@@ -1151,62 +1102,7 @@ namespace Microsoft.Azure.Devices.Client
             }
         }
 
-        internal Task<TResponse> SendCommandAsync<TRequest, TResponse>(string componentName, string commandName, Command<TRequest, TResponse> command, CancellationToken cts)
-            where TRequest : ISerializableSchema<TRequest>
-            where TResponse : ISerializableSchema<TResponse>
-        {
-            throw new NotImplementedException();
-        }
 
-        internal Task<TResponse> SendCommandAsync<TRequest, TResponse>(string commandName, Command<TRequest, TResponse> command, CancellationToken cts)
-            where TRequest : ISerializableSchema<TRequest>
-            where TResponse : ISerializableSchema<TResponse>
-        {
-            throw new NotImplementedException();
-        }
-
-        internal Task SendTelemetryAsync(string componentName, IDictionary<string, Property<ISerializableSchema>> telemetryDictionary, CancellationToken cts)
-        {
-            throw new NotImplementedException();
-        }
-
-        internal Task SendTelemetryAsync(IDictionary<string, Property<ISerializableSchema>> telemetryDictionary, CancellationToken cts)
-        {
-            throw new NotImplementedException();
-        }
-
-        internal Task SetCommandCallback<TRequest, TResponse>(string commandName, Command<TRequest, TResponse> command, Action<string, Command<TRequest, TResponse>> commandCallback)
-            where TRequest : ISerializableSchema<TRequest>
-            where TResponse : ISerializableSchema<TResponse>
-        {
-            throw new NotImplementedException();
-        }
-
-        internal Task SetCommandCallback<TRequest, TResponse>(string componentName, string commandName, Command<TRequest, TResponse> command, Action<string, string, Command<TRequest, TResponse>> commandCallback)
-            where TRequest : ISerializableSchema<TRequest>
-            where TResponse : ISerializableSchema<TResponse>
-        {
-            throw new NotImplementedException();
-        }
-
-        internal Task<TResponse> SendCommandAsync<TRequest, TResponse>(string commandName, Command<TRequest, TResponse> command)
-            where TRequest : ISerializableSchema<TRequest>
-            where TResponse : ISerializableSchema<TResponse>
-        {
-            throw new NotImplementedException();
-        }
-
-        internal Task<TResponse> SendCommandAsync<TRequest, TResponse>(string componentName, string commandName, Command<TRequest, TResponse> command)
-            where TRequest : ISerializableSchema<TRequest>
-            where TResponse : ISerializableSchema<TResponse>
-        {
-            throw new NotImplementedException();
-        }
-
-        internal Task SetWritablePropertyEvent(string componentName, string propertyName, Action<string, string, WritableProperty> propertyAction)
-        {
-            throw new NotImplementedException();
-        }
 
         internal Task SendMethodResponseAsync(MethodResponseInternal methodResponse, CancellationToken cancellationToken)
         {
@@ -2225,5 +2121,80 @@ namespace Microsoft.Azure.Devices.Client
                 : new CancellationTokenSource(TimeSpan.FromMilliseconds(OperationTimeoutInMilliseconds));
             return cts;
         }
+
+        #region PnP Convention
+        internal Task UpdatePropertiesAsync(IDictionary<string, dynamic> properties, CancellationToken cts)
+        {
+            throw new NotImplementedException();
+        }
+
+        internal Task UpdatePropertiesAsync(string componentName, IDictionary<string, dynamic> properties, CancellationToken cts = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        internal Task UpdatePropertyAsync(string propertyName, dynamic propertyValue, CancellationToken cts = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        internal Task UpdatePropertyAsync(string componentName, string propertyName, dynamic propertyValue, CancellationToken cts = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        internal Task UpdatePropertyAsync(string propertyName, WritableProperty propertyValue, CancellationToken cts = default)
+        {
+            throw new NotImplementedException();
+        }
+        internal Task UpdatePropertyAsync(string componentName, string propertyName, WritableProperty propertyValue, CancellationToken cts)
+        {
+            throw new NotImplementedException();
+        }
+
+        internal Task SendTelemetryAsync(string telemetryName, dynamic telemetryValue, CancellationToken cts = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        internal Task UpdateProperty(string componentName, string propertyName, WritableProperty propertyValue)
+        {
+            throw new NotImplementedException();
+        }
+
+        internal Task SendTelemetryAsync(string componentName, string telemetryName, dynamic telemetryValue, CancellationToken cts = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        internal Task SendTelemetryAsync(string componentName, IDictionary<string, dynamic> telemetryDictionary, CancellationToken cts)
+        {
+            throw new NotImplementedException();
+        }
+
+        internal Task SendTelemetryAsync(IDictionary<string, dynamic> telemetryDictionary, CancellationToken cts)
+        {
+            throw new NotImplementedException();
+        }
+
+        internal Task SetCommandCallback(string commandName, Func<string, dynamic, dynamic> commandCallbackAsTwinCollection)
+        {
+            throw new NotImplementedException();
+        }
+
+        internal Task SetCommandCallback(string componentName, string commandName, Func<string, string, dynamic, dynamic> commandCallbackAsTwinCollection)
+        {
+            throw new NotImplementedException();
+        }
+        internal Task SetWritablePropertyEvent(string propertyName, Action<string, string, TwinCollection> propertyAction)
+        {
+            throw new NotImplementedException();
+        }
+
+        internal Task SetWritablePropertyEvent(string componentName, string propertyName, Action<string, string, TwinCollection> propertyAction)
+        {
+            throw new NotImplementedException();
+        }
+        #endregion
     }
 }

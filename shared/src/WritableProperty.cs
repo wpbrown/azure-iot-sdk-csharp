@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Net;
 using System.Text;
 
 namespace Microsoft.Azure.Devices.Shared
@@ -27,7 +28,7 @@ namespace Microsoft.Azure.Devices.Shared
         /// <summary>
         /// The acknowledgement description, an optional, human-readable message about the result of the property update.
         /// </summary>
-        public Property<ISerializableSchema> Value { get; set; }
+        public dynamic Value { get; set; }
 
         /// <summary>
         /// 
@@ -38,18 +39,9 @@ namespace Microsoft.Azure.Devices.Shared
         /// 
         /// </summary>
         /// <param name="valueToConvert"></param>
-        protected WritableProperty(Property<ISerializableSchema> valueToConvert)
+        public WritableProperty(dynamic valueToConvert)
         {
             Value = valueToConvert;
-        }
-
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="value"></param>
-        public static implicit operator WritableProperty(Property<ISerializableSchema> value)
-        {
-            return new WritableProperty(value);
         }
 
         /// <summary>
@@ -113,14 +105,98 @@ namespace Microsoft.Azure.Devices.Shared
             return this;
         }
 
+        private static WritableProperty CreateResponse(HttpStatusCode httpStatusCode, dynamic value, long version, string message)
+        {
+            return new WritableProperty(value)
+            {
+                AckCode = (int)httpStatusCode,
+                AckDescription = message,
+                AckVersion = version
+            };
+        }
+
         /// <summary>
         /// 
         /// </summary>
         /// <param name="value"></param>
+        /// <param name="version"></param>
+        /// <param name="message"></param>
         /// <returns></returns>
-        public static WritableProperty FromProperty(Property<ISerializableSchema> value)
+        public static WritableProperty CreateOKResponse(dynamic value, long version, string message = default)
         {
-            return new WritableProperty(value);
+            return CreateResponse(HttpStatusCode.OK, value, version, message);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="version"></param>
+        /// <param name="message"></param>
+        /// <returns></returns>
+        public static WritableProperty CreateAcceptedResponse(dynamic value, long version, string message = default)
+        {
+            return CreateResponse(HttpStatusCode.Accepted, value, version, message);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="version"></param>
+        /// <param name="message"></param>
+        /// <returns></returns>
+        public static WritableProperty CreateBadRequestResponse(dynamic value, long version, string message = default)
+        {
+            return CreateResponse(HttpStatusCode.BadRequest, value, version, message);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="version"></param>
+        /// <param name="message"></param>
+        /// <returns></returns>
+        public static WritableProperty CreateNotFoundResponse(dynamic value, long version, string message = default)
+        {
+            return CreateResponse(HttpStatusCode.NotFound, value, version, message);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="version"></param>
+        /// <param name="message"></param>
+        /// <returns></returns>
+        public static WritableProperty CreateConflictResponse(dynamic value, long version, string message = default)
+        {
+            return CreateResponse(HttpStatusCode.Conflict, value, version, message);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="version"></param>
+        /// <param name="message"></param>
+        /// <returns></returns>
+        public static WritableProperty CreateInternalErrorResponse(dynamic value, long version, string message = default)
+        {
+            return CreateResponse(HttpStatusCode.InternalServerError, value, version, message);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="version"></param>
+        /// <param name="message"></param>
+        /// <returns></returns>
+        public static WritableProperty CreateNotImplementedResponse(dynamic value, long version, string message = default)
+        {
+            return CreateResponse(HttpStatusCode.NotImplemented, value, version, message);
         }
     }
 

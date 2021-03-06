@@ -22,7 +22,7 @@ namespace Microsoft.Azure.Devices.Shared
         /// <summary>
         /// 
         /// </summary>
-        public IDictionary<string, Property<ISerializableSchema>> Properties { get; private set; } = new Dictionary<string, Property<ISerializableSchema>>();
+        public IDictionary<string, TwinCollection> Properties { get; private set; } = new Dictionary<string, TwinCollection>();
 
         /// <summary>
         /// 
@@ -34,7 +34,7 @@ namespace Microsoft.Azure.Devices.Shared
         /// </summary>
         /// <param name="propertyName"></param>
         /// <param name="propertyValue"></param>
-        public void AddProperty(string propertyName, Property<ISerializableSchema> propertyValue)
+        public void AddProperty(string propertyName, TwinCollection propertyValue)
         {
             if (!string.IsNullOrEmpty(propertyName ?? throw new ArgumentNullException(nameof(propertyName), "You must specify a non-null property name to be added to the reporeted properties collection.")))
             {
@@ -50,7 +50,7 @@ namespace Microsoft.Azure.Devices.Shared
         /// <param name="propertyName"></param>
         /// <param name="propertyValue"></param>
         /// <param name="properyCallback"></param>
-        public void AddExternallyWritableProperty(string propertyName, Property<ISerializableSchema> propertyValue, Action<string, string, WritableProperty> properyCallback = default)
+        public void AddExternallyWritableProperty(string propertyName, TwinCollection propertyValue, Action<string, string, WritableProperty> properyCallback = default)
         {
             if (!string.IsNullOrEmpty(propertyName ?? throw new ArgumentNullException(nameof(propertyName), "You must specify a non-null property name to be added to the externally writable properties collection.")))
             {
