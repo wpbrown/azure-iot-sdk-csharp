@@ -736,14 +736,14 @@ namespace Microsoft.Azure.Devices.Client
         /// <param name="componentName"></param>
         /// <param name="propertyName"></param>
         /// <param name="propertyActionAsTwinCollection"></param>
-        public void SetWritablePropertyEvent(string componentName, string propertyName, Action<string, string, TwinCollection> propertyActionAsTwinCollection) => InternalClient.SetWritablePropertyEvent(componentName, propertyName, propertyActionAsTwinCollection);
+        public void RespondToWritablePropertyEvent(string componentName, string propertyName, Action<string, string, TwinCollection> propertyActionAsTwinCollection) => InternalClient.SetWritablePropertyEvent(componentName, propertyName, propertyActionAsTwinCollection);
 
         /// <summary>
         /// Set the writable property callback.
         /// </summary>
         /// <param name="propertyName"></param>
         /// <param name="propertyActionAsTwinCollection"></param>
-        public void SetWritablePropertyEvent(string propertyName, Action<string, string, TwinCollection> propertyActionAsTwinCollection) => InternalClient.SetWritablePropertyEvent(propertyName, propertyActionAsTwinCollection);
+        public void RespondToWritablePropertyEvent(string propertyName, Action<string, string, TwinCollection> propertyActionAsTwinCollection) => InternalClient.SetWritablePropertyEvent(propertyName, propertyActionAsTwinCollection);
 
         /// <summary>
         /// Send a single instance of telemetry.
@@ -751,7 +751,7 @@ namespace Microsoft.Azure.Devices.Client
         /// <param name="telemetryName"></param>
         /// <param name="telemetryValue"></param>
         /// <param name="cts"></param>
-        public Task SendTelemetryAsync(string telemetryName, dynamic telemetryValue, CancellationToken cts = default) => InternalClient.SendTelemetryAsync(telemetryName, telemetryValue, cts);
+        public Task SendTelemetryAsync(string telemetryName, dynamic telemetryValue, CancellationToken cts = default) => InternalClient.SendTelemetryAsync(telemetryName, telemetryValue: telemetryValue, cts: cts);
 
         /// <summary>
         /// Send a single instance of telemetry for the specified component.
@@ -768,6 +768,25 @@ namespace Microsoft.Azure.Devices.Client
         /// <param name="telemetryDictionary"></param>
         /// <param name="cts"></param>
         public Task SendTelemetryAsync(IDictionary<string, dynamic> telemetryDictionary, CancellationToken cts = default) => InternalClient.SendTelemetryAsync(telemetryDictionary, cts);
+
+
+        /// <summary>
+        /// Push reported property changes up to the service.
+        /// </summary>
+        /// <param name="componentName"></param>
+        /// <param name="telemetryMessage"></param>
+        /// <param name="cts"></param>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1062:Validate arguments of public methods", Justification = "<Pending>")]
+        public Task SendTelemetryAsync(string componentName, Message telemetryMessage, CancellationToken cts = default) => InternalClient.SendTelemetryAsync(componentName, telemetryMessage, cts);
+
+
+        /// <summary>
+        /// Push reported property changes up to the service.
+        /// </summary>
+        /// <param name="telemetryMessage"></param>
+        /// <param name="cts"></param>
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Design", "CA1062:Validate arguments of public methods", Justification = "<Pending>")]
+        public Task SendTelemetryAsync(Message telemetryMessage, CancellationToken cts = default) => InternalClient.SendTelemetryAsync(telemetryMessage, cts);
 
         /// <summary>
         /// Push reported property changes up to the service.

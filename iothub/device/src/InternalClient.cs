@@ -1103,7 +1103,6 @@ namespace Microsoft.Azure.Devices.Client
         }
 
 
-
         internal Task SendMethodResponseAsync(MethodResponseInternal methodResponse, CancellationToken cancellationToken)
         {
             try
@@ -2173,6 +2172,11 @@ namespace Microsoft.Azure.Devices.Client
         }
 
         internal Task SendTelemetryAsync(IDictionary<string, dynamic> telemetryDictionary, CancellationToken cts)
+        {
+            throw new NotImplementedException();
+        }
+
+        internal Task SendTelemetryAsync(Message telemetryDictionary, CancellationToken cts)
         {
             throw new NotImplementedException();
         }
