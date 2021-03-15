@@ -2132,31 +2132,11 @@ namespace Microsoft.Azure.Devices.Client
             throw new NotImplementedException();
         }
 
-        internal Task UpdatePropertyAsync(string propertyName, dynamic propertyValue, CancellationToken cts = default)
-        {
-            throw new NotImplementedException();
-        }
-
-        internal Task UpdatePropertyAsync(string componentName, string propertyName, dynamic propertyValue, CancellationToken cts = default)
-        {
-            throw new NotImplementedException();
-        }
-
         internal Task UpdatePropertyAsync(string propertyName, WritableProperty propertyValue, CancellationToken cts = default)
         {
             throw new NotImplementedException();
         }
         internal Task UpdatePropertyAsync(string componentName, string propertyName, WritableProperty propertyValue, CancellationToken cts)
-        {
-            throw new NotImplementedException();
-        }
-
-        internal Task SendTelemetryAsync(string telemetryName, dynamic telemetryValue, CancellationToken cts = default)
-        {
-            throw new NotImplementedException();
-        }
-
-        internal Task UpdateProperty(string componentName, string propertyName, WritableProperty propertyValue)
         {
             throw new NotImplementedException();
         }
@@ -2190,7 +2170,18 @@ namespace Microsoft.Azure.Devices.Client
         {
             throw new NotImplementedException();
         }
-        internal Task SetWritablePropertyEvent(string propertyName, Action<string, string, TwinCollection> propertyAction)
+
+        internal Task SetWritablePropertyEvent(Action<TwinCollection> propertyAction)
+        {
+            throw new NotImplementedException();
+        }
+
+        internal Task SetWritablePropertyEvent(string propertyName, Action<string, TwinCollection> propertyAction)
+        {
+            throw new NotImplementedException();
+        }
+
+        internal Task SetWritablePropertyEventPerComponent(string componentName, Action<string, TwinCollection> propertyAction)
         {
             throw new NotImplementedException();
         }
