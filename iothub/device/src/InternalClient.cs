@@ -2122,51 +2122,12 @@ namespace Microsoft.Azure.Devices.Client
         }
 
         #region PnP Convention
-        internal Task UpdatePropertiesAsync(IDictionary<string, dynamic> properties, CancellationToken cts)
+        internal Task UpdatePropertiesAsync(IDictionary<string, dynamic> properties, string componentName, CancellationToken cts)
         {
             throw new NotImplementedException();
         }
 
-        internal Task UpdatePropertiesAsync(string componentName, IDictionary<string, dynamic> properties, CancellationToken cts = default)
-        {
-            throw new NotImplementedException();
-        }
-
-        internal Task UpdatePropertyAsync(string propertyName, WritableProperty propertyValue, CancellationToken cts = default)
-        {
-            throw new NotImplementedException();
-        }
-        internal Task UpdatePropertyAsync(string componentName, string propertyName, WritableProperty propertyValue, CancellationToken cts)
-        {
-            throw new NotImplementedException();
-        }
-
-        internal Task SendTelemetryAsync(string componentName, string telemetryName, dynamic telemetryValue, CancellationToken cts = default)
-        {
-            throw new NotImplementedException();
-        }
-
-        internal Task SendTelemetryAsync(string componentName, IDictionary<string, dynamic> telemetryDictionary, CancellationToken cts)
-        {
-            throw new NotImplementedException();
-        }
-
-        internal Task SendTelemetryAsync(IDictionary<string, dynamic> telemetryDictionary, CancellationToken cts)
-        {
-            throw new NotImplementedException();
-        }
-
-        internal Task SendTelemetryAsync(Message telemetryDictionary, CancellationToken cts)
-        {
-            throw new NotImplementedException();
-        }
-
-        internal Task SetCommandCallback(string commandName, Func<string, dynamic, dynamic> commandCallbackAsTwinCollection)
-        {
-            throw new NotImplementedException();
-        }
-
-        internal Task SetCommandCallback(string componentName, string commandName, Func<string, string, dynamic, dynamic> commandCallbackAsTwinCollection)
+        internal Task UpdatePropertyAsync(string propertyName, WritableProperty propertyValue, string componentName, CancellationToken cts)
         {
             throw new NotImplementedException();
         }
@@ -2190,6 +2151,28 @@ namespace Microsoft.Azure.Devices.Client
         {
             throw new NotImplementedException();
         }
+
+        internal Task SendTelemetryAsync(IDictionary<string, dynamic> telemetryDictionary, string componentName, CancellationToken cts)
+        {
+            throw new NotImplementedException();
+        }
+
+        internal Task SendTelemetryAsync(Message telemetryDictionary, string componentName, CancellationToken cts)
+        {
+            throw new NotImplementedException();
+        }
+
+        internal Task SetCommandCallbackHandler(string commandName, Func<CommandRequest, object, Task<CommandResponse>> commandCallback, string componentName = default, object userContext = default, CancellationToken cts = default)
+        {
+            throw new NotImplementedException();
+        }
+
+        // For reference => what was the callback's original design?
+        internal Task SetCommandCallback(string componentName, string commandName, Func<string, string, dynamic, dynamic> commandCallbackAsTwinCollection)
+        {
+            throw new NotImplementedException();
+        }
+
         #endregion
     }
 }

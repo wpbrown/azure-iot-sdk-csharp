@@ -105,6 +105,14 @@ namespace Microsoft.Azure.Devices.Shared
             return this;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="httpStatusCode"></param>
+        /// <param name="value"></param>
+        /// <param name="version"></param>
+        /// <param name="message"></param>
+        /// <returns></returns>
         public static WritableProperty CreateResponse(HttpStatusCode httpStatusCode, dynamic value, long version, string message)
         {
             return new WritableProperty(value)

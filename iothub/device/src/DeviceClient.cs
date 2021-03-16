@@ -684,29 +684,14 @@ namespace Microsoft.Azure.Devices.Client
         // PnP operations
 
         /// <summary>
-        /// Update a single property under the root component.
+        /// Update a single property.
+        /// 
+        /// Property under the root component:
         /// "reported": {
         ///     "temperature": 21.3
         /// }
-        /// </summary>
-        /// <param name="propertyName"></param>
-        /// <param name="propertyValue"></param>
-        /// <param name="cts"></param>
-        public Task UpdatePropertyAsync(string propertyName, dynamic propertyValue, CancellationToken cts = default) => UpdatePropertiesAsync(new Dictionary<string, dynamic> { { propertyName, propertyValue } }, cts);
-
-        /// <summary>
-        /// Update properties under the root component.
-        /// "reported": {
-        ///     "temperature": 21.3,
-        ///     "humudity": 60
-        /// }
-        /// </summary>
-        /// <param name="properties">Reported properties to push</param>
-        /// <param name="cts"></param>
-        public Task UpdatePropertiesAsync(IDictionary<string, dynamic> properties, CancellationToken cts = default) => InternalClient.UpdatePropertiesAsync(properties, cts);
-
-        /// <summary>
-        /// Update a single property for the specified component.
+        /// 
+        /// Property under a specified component:
         /// "reported": {
         ///     "thermostat1": {
         ///         "__t": "c",
@@ -714,14 +699,22 @@ namespace Microsoft.Azure.Devices.Client
         ///     }
         /// }
         /// </summary>
-        /// <param name="componentName"></param>
         /// <param name="propertyName"></param>
         /// <param name="propertyValue"></param>
+        /// <param name="componentName"></param>
         /// <param name="cts"></param>
-        public Task UpdatePropertyAsync(string componentName, string propertyName, dynamic propertyValue, CancellationToken cts = default) => UpdatePropertiesAsync(componentName, new Dictionary<string, dynamic> { { propertyName, propertyValue } }, cts);
+        public Task UpdatePropertyAsync(string propertyName, dynamic propertyValue, string componentName = default, CancellationToken cts = default) => UpdatePropertiesAsync(new Dictionary<string, dynamic> { { propertyName, propertyValue } }, componentName, cts);
 
         /// <summary>
-        /// Update properties for the specified component.
+        /// Update a batch of properties.
+        /// 
+        /// Properties under the root component:
+        /// "reported": {
+        ///     "temperature": 21.3,
+        ///     "humudity": 60
+        /// }
+        /// 
+        /// Properties under a specified component:
         /// "reported": {
         ///     "thermostat1": {
         ///         "__t": "c",
@@ -730,13 +723,15 @@ namespace Microsoft.Azure.Devices.Client
         ///     }
         /// }
         /// </summary>
-        /// <param name="componentName"></param>
         /// <param name="properties">Reported properties to push</param>
+        /// <param name="componentName"></param>
         /// <param name="cts"></param>
-        public Task UpdatePropertiesAsync(string componentName, IDictionary<string, dynamic> properties, CancellationToken cts = default) => InternalClient.UpdatePropertiesAsync(componentName, properties, cts);
+        public Task UpdatePropertiesAsync(IDictionary<string, dynamic> properties, string componentName = default, CancellationToken cts = default) => InternalClient.UpdatePropertiesAsync(properties, componentName, cts);
 
         /// <summary>
         /// Respond to a writable property request.
+        /// 
+        /// Property under the root component:
         /// "reported": {
         ///     "targetTemperature": {
         ///         "value": 21.3,
@@ -745,14 +740,8 @@ namespace Microsoft.Azure.Devices.Client
         ///         "ad": "complete"
         ///     }
         /// }
-        /// </summary>
-        /// <param name="propertyName"></param>
-        /// <param name="propertyValue"></param>
-        /// <param name="cts"></param>
-        public Task UpdatePropertyAsync(string propertyName, WritableProperty propertyValue, CancellationToken cts = default) => InternalClient.UpdatePropertyAsync(propertyName, propertyValue, cts);
-
-        /// <summary>
-        /// Respond to a writable property request for the specified component.
+        /// 
+        /// Property under a specified component:
         /// "reported": {
         ///   "thermostat1": {
         ///     "__t": "c",
@@ -763,12 +752,13 @@ namespace Microsoft.Azure.Devices.Client
         ///       "ad": "complete"
         ///     }
         ///   }
-        /// }        /// </summary>
-        /// <param name="componentName"></param>
+        /// }
+        /// </summary>
         /// <param name="propertyName"></param>
         /// <param name="propertyValue"></param>
+        /// <param name="componentName"></param>
         /// <param name="cts"></param>
-        public Task UpdatePropertyAsync(string componentName, string propertyName, WritableProperty propertyValue, CancellationToken cts = default) => InternalClient.UpdatePropertyAsync(componentName, propertyName, propertyValue, cts);
+        public Task UpdatePropertyAsync(string propertyName, WritableProperty propertyValue, string componentName = default, CancellationToken cts = default) => InternalClient.UpdatePropertyAsync(propertyName, propertyValue, componentName, cts);
 
         /// <summary>
         /// Set the writable property callback for all properties under the root component.
@@ -794,6 +784,7 @@ namespace Microsoft.Azure.Devices.Client
         /// "$version" : 3
         /// 
         /// RENAME => RespondTo indicates that we are actually returning a response from this method call.
+        /// VERSION => if service updates multiple properties, the same "desired property version" would be returned to multiple handlers.
         /// 
         /// </summary>
         /// <param name="propertyName"></param>
@@ -843,39 +834,17 @@ namespace Microsoft.Azure.Devices.Client
         /// </summary>
         /// <param name="telemetryName"></param>
         /// <param name="telemetryValue"></param>
+        /// <param name="componentName"></param>
         /// <param name="cts"></param>
-        public Task SendTelemetryAsync(string telemetryName, dynamic telemetryValue, CancellationToken cts = default) => SendTelemetryAsync(new Dictionary<string, dynamic> { { telemetryName, telemetryValue } }, cts);
+        public Task SendTelemetryAsync(string telemetryName, dynamic telemetryValue, string componentName = default, CancellationToken cts = default) => SendTelemetryAsync(new Dictionary<string, dynamic> { { telemetryName, telemetryValue } }, componentName, cts);
 
         /// <summary>
         /// Send a batched instance of telemetry.
         /// </summary>
-        /// <param name="telemetryDictionary"></param>
-        /// <param name="cts"></param>
-        public Task SendTelemetryAsync(IDictionary<string, dynamic> telemetryDictionary, CancellationToken cts = default) => InternalClient.SendTelemetryAsync(telemetryDictionary, cts);
-
-        /// <summary>
-        /// Send a single instance of telemetry for the specified component.
-        /// </summary>
-        /// <param name="telemetryMessage"></param>
-        /// <param name="cts"></param>
-        public Task SendTelemetryAsync(Message telemetryMessage, CancellationToken cts = default) => InternalClient.SendTelemetryAsync(telemetryMessage, cts);
-
-        /// <summary>
-        /// Send a single instance of telemetry for the specified component.
-        /// </summary>
-        /// <param name="componentName"></param>
-        /// <param name="telemetryName"></param>
-        /// <param name="telemetryValue"></param>
-        /// <param name="cts"></param>
-        public Task SendTelemetryAsync(string componentName, string telemetryName, dynamic telemetryValue, CancellationToken cts = default) => InternalClient.SendTelemetryAsync(componentName, telemetryName, telemetryValue, cts);
-
-        /// <summary>
-        /// Send a batched instance of telemetry for the specified component.
-        /// </summary>
         /// <param name="componentName"></param>
         /// <param name="telemetryDictionary"></param>
         /// <param name="cts"></param>
-        public Task SendTelemetryAsync(string componentName, IDictionary<string, dynamic> telemetryDictionary, CancellationToken cts = default) => InternalClient.SendTelemetryAsync(componentName, telemetryDictionary, cts);
+        public Task SendTelemetryAsync(IDictionary<string, dynamic> telemetryDictionary, string componentName = default, CancellationToken cts = default) => InternalClient.SendTelemetryAsync(telemetryDictionary, componentName, cts);
 
         /// <summary>
         /// Send a single instance of telemetry.
@@ -884,24 +853,18 @@ namespace Microsoft.Azure.Devices.Client
         /// <param name="telemetryMessage"></param>
         /// <param name="cts"></param>
 #pragma warning disable CA1062 // Validate arguments of public methods
-        public Task SendTelemetryAsync(string componentName, Message telemetryMessage, CancellationToken cts = default) => InternalClient.SendTelemetryAsync(componentName, telemetryMessage, cts);
+        public Task SendTelemetryAsync(Message telemetryMessage, string componentName = default, CancellationToken cts = default) => InternalClient.SendTelemetryAsync(telemetryMessage, componentName, cts);
 #pragma warning restore CA1062 // Validate arguments of public methods
 
         /// <summary>
-        /// 
+        /// Set command callback handler.
         /// </summary>
+        /// <param name="commandName"></param>
+        /// <param name="commandCallback"></param>
         /// <param name="componentName"></param>
-        /// <param name="commandName"></param>
-        /// <param name="commandCallback"></param>
-        public void SetCommandCallback(string componentName, string commandName, Func<string, string, dynamic, dynamic> commandCallback)
-            => InternalClient.SetCommandCallback(componentName, commandName, commandCallback);
-
-        /// <summary>
-        /// Push reported property changes up to the service.
-        /// </summary>
-        /// <param name="commandName"></param>
-        /// <param name="commandCallback"></param>
-        public void SetCommandCallbackTwinCollection(string commandName, Func<string, dynamic, dynamic> commandCallback)
-            => InternalClient.SetCommandCallback(commandName, commandCallback);
+        /// <param name="userContext"></param>
+        /// <param name="cts"></param>
+        public Task SetCommandCallbackHandler(string commandName, Func<CommandRequest, object, Task<CommandResponse>> commandCallback, string componentName = default, object userContext = default, CancellationToken cts = default)
+            => InternalClient.SetCommandCallbackHandler(commandName, commandCallback, componentName, userContext, cts);
     }
 }
