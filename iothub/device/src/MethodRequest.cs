@@ -9,7 +9,7 @@ namespace Microsoft.Azure.Devices.Client
     /// <summary>
     /// The data structure that represents a method request.
     /// </summary>
-    public sealed class MethodRequest
+    public class MethodRequest
     {
         /// <summary>
         /// Initializes a new instance of the <see cref="MethodRequest"/> class with without any method data
