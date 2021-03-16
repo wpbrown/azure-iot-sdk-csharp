@@ -15,7 +15,7 @@ namespace Microsoft.Azure.Devices.Client
         /// <summary>
         /// </summary>
         /// <param name="name"></param>
-        public CommandRequest(string name) : this(name, null)
+        internal CommandRequest(string name) : this (name, null)
         {
         }
 
@@ -23,7 +23,7 @@ namespace Microsoft.Azure.Devices.Client
         /// </summary>
         /// <param name="name"></param>
         /// <param name="data"></param>
-        public CommandRequest(string name, dynamic data)
+        internal CommandRequest(string name, dynamic data)
         {
             if (name == null)
             {
@@ -56,5 +56,10 @@ namespace Microsoft.Azure.Devices.Client
         /// <summary>
         /// </summary>
         public dynamic Data { get; private set; }
+
+        /// <summary>
+        /// The method data in Json format.
+        /// </summary>
+        public string DataAsJson => (Data == null || Data.Length == 0) ? null : Encoding.UTF8.GetString(Data);
     }
 }

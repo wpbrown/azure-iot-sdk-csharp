@@ -779,7 +779,7 @@ namespace Microsoft.Azure.Devices.Client
         public void RespondToWritablePropertyEvent(Action<TwinCollection> propertyActionAsTwinCollection)
             => InternalClient.SetWritablePropertyEvent(propertyActionAsTwinCollection);
 
-        /// <summary>
+        /*/// <summary>
         /// Set the writable property callback for a single property under the root component.
         /// "desired" :
         /// {
@@ -834,7 +834,7 @@ namespace Microsoft.Azure.Devices.Client
         /// <param name="propertyName"></param>
         /// <param name="propertyActionAsTwinCollection"></param>
         public void RespondToWritablePropertyEvent(string componentName, string propertyName, Action<string, string, TwinCollection> propertyActionAsTwinCollection)
-            => InternalClient.SetWritablePropertyEvent(componentName, propertyName, propertyActionAsTwinCollection);
+            => InternalClient.SetWritablePropertyEvent(componentName, propertyName, propertyActionAsTwinCollection);*/
 
         /// <summary>
         /// Send a single instance of telemetry.
@@ -857,6 +857,7 @@ namespace Microsoft.Azure.Devices.Client
 
         /// <summary>
         /// Send a single instance of telemetry.
+        /// - specify encoding and content type in comments
         /// </summary>
         /// <param name="componentName"></param>
         /// <param name="telemetryMessage"></param>

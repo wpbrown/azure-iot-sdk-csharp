@@ -8,7 +8,7 @@ namespace Microsoft.Azure.Devices.Client
     /// <summary>
     /// The data structure represent the Device Twin Method that is used for triggering an activity on the device
     /// </summary>
-    public sealed class MethodResponse
+    public class MethodResponse
     {
         private byte[] _result;
 
