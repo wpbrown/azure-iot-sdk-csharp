@@ -703,7 +703,8 @@ namespace Microsoft.Azure.Devices.Client
         /// <param name="propertyValue"></param>
         /// <param name="componentName"></param>
         /// <param name="cts"></param>
-        public Task UpdatePropertyAsync(string propertyName, dynamic propertyValue, string componentName = default, CancellationToken cts = default) => UpdatePropertiesAsync(new Dictionary<string, dynamic> { { propertyName, propertyValue } }, componentName, cts);
+        public Task UpdatePropertyAsync(string propertyName, dynamic propertyValue, string componentName = default, CancellationToken cts = default)
+            => UpdatePropertiesAsync(new Dictionary<string, dynamic> { { propertyName, propertyValue } }, componentName, cts);
 
         /// <summary>
         /// Update a batch of properties.
@@ -726,7 +727,8 @@ namespace Microsoft.Azure.Devices.Client
         /// <param name="properties">Reported properties to push</param>
         /// <param name="componentName"></param>
         /// <param name="cts"></param>
-        public Task UpdatePropertiesAsync(IDictionary<string, dynamic> properties, string componentName = default, CancellationToken cts = default) => InternalClient.UpdatePropertiesAsync(properties, componentName, cts);
+        public Task UpdatePropertiesAsync(IDictionary<string, dynamic> properties, string componentName = default, CancellationToken cts = default)
+            => InternalClient.UpdatePropertiesAsync(properties, componentName, cts);
 
         /// <summary>
         /// Respond to a writable property request.
@@ -758,7 +760,8 @@ namespace Microsoft.Azure.Devices.Client
         /// <param name="propertyValue"></param>
         /// <param name="componentName"></param>
         /// <param name="cts"></param>
-        public Task UpdatePropertyAsync(string propertyName, WritableProperty propertyValue, string componentName = default, CancellationToken cts = default) => InternalClient.UpdatePropertyAsync(propertyName, propertyValue, componentName, cts);
+        public Task UpdatePropertyAsync(string propertyName, WritableProperty propertyValue, string componentName = default, CancellationToken cts = default)
+            => InternalClient.UpdatePropertyAsync(propertyName, propertyValue, componentName, cts);
 
         /// <summary>
         /// Set the writable property callback for all properties under the root component.
@@ -773,7 +776,8 @@ namespace Microsoft.Azure.Devices.Client
         /// 
         /// </summary>
         /// <param name="propertyActionAsTwinCollection"></param>
-        public void RespondToWritablePropertyEvent(Action<TwinCollection> propertyActionAsTwinCollection) => InternalClient.SetWritablePropertyEvent(propertyActionAsTwinCollection);
+        public void RespondToWritablePropertyEvent(Action<TwinCollection> propertyActionAsTwinCollection)
+            => InternalClient.SetWritablePropertyEvent(propertyActionAsTwinCollection);
 
         /// <summary>
         /// Set the writable property callback for a single property under the root component.
@@ -789,7 +793,8 @@ namespace Microsoft.Azure.Devices.Client
         /// </summary>
         /// <param name="propertyName"></param>
         /// <param name="propertyActionAsTwinCollection"></param>
-        public void RespondToWritablePropertyEvent(string propertyName, Action<string, TwinCollection> propertyActionAsTwinCollection) => InternalClient.SetWritablePropertyEvent(propertyName, propertyActionAsTwinCollection);
+        public void RespondToWritablePropertyEvent(string propertyName, Action<string, TwinCollection> propertyActionAsTwinCollection)
+            => InternalClient.SetWritablePropertyEvent(propertyName, propertyActionAsTwinCollection);
 
         /// <summary>
         /// Set the writable property callback for all properties for the specified component.
@@ -809,7 +814,8 @@ namespace Microsoft.Azure.Devices.Client
         /// </summary>
         /// <param name="componentName"></param>
         /// <param name="propertyActionAsTwinCollection"></param>
-        public void RespondToWritablePropertyEventPerComponent(string componentName, Action<string, TwinCollection> propertyActionAsTwinCollection) => InternalClient.SetWritablePropertyEventPerComponent(componentName, propertyActionAsTwinCollection);
+        public void RespondToWritablePropertyEventPerComponent(string componentName, Action<string, TwinCollection> propertyActionAsTwinCollection)
+            => InternalClient.SetWritablePropertyEventPerComponent(componentName, propertyActionAsTwinCollection);
 
         /// <summary>
         /// Set the writable property callback for a specific property for the specified component.
@@ -827,7 +833,8 @@ namespace Microsoft.Azure.Devices.Client
         /// <param name="componentName"></param>
         /// <param name="propertyName"></param>
         /// <param name="propertyActionAsTwinCollection"></param>
-        public void RespondToWritablePropertyEvent(string componentName, string propertyName, Action<string, string, TwinCollection> propertyActionAsTwinCollection) => InternalClient.SetWritablePropertyEvent(componentName, propertyName, propertyActionAsTwinCollection);
+        public void RespondToWritablePropertyEvent(string componentName, string propertyName, Action<string, string, TwinCollection> propertyActionAsTwinCollection)
+            => InternalClient.SetWritablePropertyEvent(componentName, propertyName, propertyActionAsTwinCollection);
 
         /// <summary>
         /// Send a single instance of telemetry.
@@ -836,7 +843,8 @@ namespace Microsoft.Azure.Devices.Client
         /// <param name="telemetryValue"></param>
         /// <param name="componentName"></param>
         /// <param name="cts"></param>
-        public Task SendTelemetryAsync(string telemetryName, dynamic telemetryValue, string componentName = default, CancellationToken cts = default) => SendTelemetryAsync(new Dictionary<string, dynamic> { { telemetryName, telemetryValue } }, componentName, cts);
+        public Task SendTelemetryAsync(string telemetryName, dynamic telemetryValue, string componentName = default, CancellationToken cts = default)
+            => SendTelemetryAsync(new Dictionary<string, dynamic> { { telemetryName, telemetryValue } }, componentName, cts);
 
         /// <summary>
         /// Send a batched instance of telemetry.
@@ -844,7 +852,8 @@ namespace Microsoft.Azure.Devices.Client
         /// <param name="componentName"></param>
         /// <param name="telemetryDictionary"></param>
         /// <param name="cts"></param>
-        public Task SendTelemetryAsync(IDictionary<string, dynamic> telemetryDictionary, string componentName = default, CancellationToken cts = default) => InternalClient.SendTelemetryAsync(telemetryDictionary, componentName, cts);
+        public Task SendTelemetryAsync(IDictionary<string, dynamic> telemetryDictionary, string componentName = default, CancellationToken cts = default)
+            => InternalClient.SendTelemetryAsync(telemetryDictionary, componentName, cts);
 
         /// <summary>
         /// Send a single instance of telemetry.
@@ -853,7 +862,8 @@ namespace Microsoft.Azure.Devices.Client
         /// <param name="telemetryMessage"></param>
         /// <param name="cts"></param>
 #pragma warning disable CA1062 // Validate arguments of public methods
-        public Task SendTelemetryAsync(Message telemetryMessage, string componentName = default, CancellationToken cts = default) => InternalClient.SendTelemetryAsync(telemetryMessage, componentName, cts);
+        public Task SendTelemetryAsync(Message telemetryMessage, string componentName = default, CancellationToken cts = default)
+            => InternalClient.SendTelemetryAsync(telemetryMessage, componentName, cts);
 #pragma warning restore CA1062 // Validate arguments of public methods
 
         /// <summary>

@@ -2162,7 +2162,7 @@ namespace Microsoft.Azure.Devices.Client
             throw new NotImplementedException();
         }
 
-        internal Task SetCommandCallbackHandler(string commandName, Func<CommandRequest, object, Task<CommandResponse>> commandCallback, string componentName = default, object userContext = default, CancellationToken cts = default)
+        internal Task SetCommandCallbackHandler(string commandName, Func<CommandRequest, object, Task<CommandResponse>> commandCallback, string componentName, object userContext, CancellationToken cts)
         {
             throw new NotImplementedException();
         }
