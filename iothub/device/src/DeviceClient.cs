@@ -721,7 +721,7 @@ namespace Microsoft.Azure.Devices.Client
         /// <param name="propertyValue"></param>
         /// <param name="componentName"></param>
         /// <param name="cancellationToken"></param>
-        public Task RespondToWritablePropertyEventAsync(string propertyName, dynamic propertyValue, string componentName = default, CancellationToken cancellationToken = default)
+        public Task RespondToWritablePropertyEventAsync(string propertyName, WritableProperty propertyValue, string componentName = default, CancellationToken cancellationToken = default)
             => InternalClient.UpdatePropertyAsync(propertyName, propertyValue, componentName, cancellationToken);
 
         /// <summary>
