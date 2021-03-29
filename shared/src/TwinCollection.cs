@@ -261,7 +261,7 @@ namespace Microsoft.Azure.Devices.Shared
             return true;
         }
 
-        private bool TrySetMemberInternal(string propertyName, object value)
+        private bool TrySetMemberInternal(string propertyName, dynamic value)
         {
             JToken valueJToken = value == null ? null : JToken.FromObject(value);
             if (JObject.TryGetValue(propertyName, out _))

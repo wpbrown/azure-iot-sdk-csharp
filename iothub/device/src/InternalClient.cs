@@ -1070,6 +1070,7 @@ namespace Microsoft.Azure.Devices.Client
             }
         }
 
+        
 
         internal Task SendMethodResponseAsync(MethodResponseInternal methodResponse, CancellationToken cancellationToken)
         {
@@ -1177,6 +1178,7 @@ namespace Microsoft.Azure.Devices.Client
             // Obsoleted due to incorrect naming:
             return SetDesiredPropertyUpdateCallbackAsync(callback, userContext);
         }
+
 
         /// <summary>
         /// Retrieve the device twin properties for the current device.
@@ -1303,7 +1305,7 @@ namespace Microsoft.Azure.Devices.Client
         public Task SendTelemetryAsync(string serializedTelemetry, CancellationToken cancellationToken)
         {
             using var message = new Message(Encoding.UTF8.GetBytes(serializedTelemetry));
-            message.ContentType = "application/json";
+            message.ContentType =  "application/json";
             message.ContentEncoding = "utf-8";
             return this.SendEventAsync(message, cancellationToken);
         }
@@ -2036,6 +2038,7 @@ namespace Microsoft.Azure.Devices.Client
         }
 
         #region PnP Convention
+
         internal Task UpdatePropertiesAsync(IDictionary<string, dynamic> properties, string componentName, CancellationToken cts)
         {
             throw new NotImplementedException();
@@ -2046,34 +2049,26 @@ namespace Microsoft.Azure.Devices.Client
             throw new NotImplementedException();
         }
 
-        internal Task SetWritablePropertyEvent(Action<TwinCollection> propertyAction)
+        internal Task SendTelemetryAsync(IDictionary<string, dynamic> telemetryDictionary, string componentName, IConventionHandler telemetrySerializer, CancellationToken cts)
         {
-            throw new NotImplementedException();
+            if (telemetrySerializer == null)
+            {
+                telemetrySerializer = DefaultTelemetryConventionHandler.Instance;
+            }
+            using var telemetryMessage = new Message(telemetrySerializer.GetObjectBytes(telemetryDictionary));
+            return SendTelemetryAsync(telemetryMessage, componentName, telemetrySerializer, cts);
         }
 
-        internal Task SetWritablePropertyEvent(string propertyName, Action<string, TwinCollection> propertyAction)
+        internal Task SendTelemetryAsync(Message telemetryMessage, string componentName, IConventionHandler telemetrySerializer, CancellationToken cts)
         {
-            throw new NotImplementedException();
-        }
-
-        internal Task SetWritablePropertyEventPerComponent(string componentName, Action<string, TwinCollection> propertyAction)
-        {
-            throw new NotImplementedException();
-        }
-
-        internal Task SetWritablePropertyEvent(string componentName, string propertyName, Action<string, string, TwinCollection> propertyAction)
-        {
-            throw new NotImplementedException();
-        }
-
-        internal Task SendTelemetryAsync(IDictionary<string, dynamic> telemetryDictionary, string componentName, CancellationToken cts)
-        {
-            throw new NotImplementedException();
-        }
-
-        internal Task SendTelemetryAsync(Message telemetryDictionary, string componentName, CancellationToken cts)
-        {
-            throw new NotImplementedException();
+            if (telemetrySerializer == null)
+            {
+                telemetrySerializer = DefaultTelemetryConventionHandler.Instance;
+            }
+            telemetryMessage.ComponentName = componentName ?? string.Empty;
+            telemetryMessage.ContentType = telemetrySerializer?.ContentType ?? "application/json";
+            telemetryMessage.ContentEncoding = telemetrySerializer?.ContentEncoding.WebName ?? Encoding.UTF8.WebName;
+            return this.SendEventAsync(telemetryMessage, cts);
         }
 
         internal Task SetCommandCallbackHandler(string commandName, Func<CommandRequest, object, Task<CommandResponse>> commandCallback, string componentName, object userContext, CancellationToken cts)
@@ -2081,8 +2076,17 @@ namespace Microsoft.Azure.Devices.Client
             throw new NotImplementedException();
         }
 
-        // For reference => what was the callback's original design?
-        internal Task SetCommandCallback(string componentName, string commandName, Func<string, string, dynamic, dynamic> commandCallbackAsTwinCollection)
+        internal Task SetCommandCallbackHandler(Func<CommandRequest, object, Task<CommandResponse>> commandCallback, object userContext, CancellationToken cts)
+        {
+            throw new NotImplementedException();
+        }
+
+        internal Task ListenToWritablePropertyEvent(object propertyCollection, object componentName, CancellationToken cancellationToken)
+        {
+            throw new NotImplementedException();
+        }
+
+        internal Task UpdatePropertiesAsync(TwinCollection propertyCollection, string componentName, CancellationToken cancellationToken)
         {
             throw new NotImplementedException();
         }

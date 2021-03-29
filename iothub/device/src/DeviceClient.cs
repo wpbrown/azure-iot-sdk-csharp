@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using Microsoft.Azure.Devices.Client.Transport;
 using Microsoft.Azure.Devices.Shared;
+using Newtonsoft.Json;
 
 namespace Microsoft.Azure.Devices.Client
 {
@@ -691,199 +692,102 @@ namespace Microsoft.Azure.Devices.Client
         public Task UpdateReportedPropertiesAsync(TwinCollection reportedProperties) =>
             InternalClient.UpdateReportedPropertiesAsync(reportedProperties);
 
-        /// <summary>
-        /// Push reported property changes up to the service.
-        /// </summary>
-        /// <param name="reportedProperties">Reported properties to push</param>
-        /// <param name="cancellationToken">A cancellation token to cancel the operation.</param>
-        /// <exception cref="OperationCanceledException">Thrown when the operation has been canceled.</exception>
-        public Task UpdateReportedPropertiesAsync(TwinCollection reportedProperties, CancellationToken cancellationToken) =>
-            InternalClient.UpdateReportedPropertiesAsync(reportedProperties, cancellationToken);
-
-        // PnP operations
+        #region Convention driven commands
 
         /// <summary>
         /// Update a single property.
-        /// 
-        /// Property under the root component:
-        /// "reported": {
-        ///     "temperature": 21.3
-        /// }
-        /// 
-        /// Property under a specified component:
-        /// "reported": {
-        ///     "thermostat1": {
-        ///         "__t": "c",
-        ///         "temperature": 21.3
-        ///     }
-        /// }
         /// </summary>
         /// <param name="propertyName"></param>
         /// <param name="propertyValue"></param>
         /// <param name="componentName"></param>
-        /// <param name="cts"></param>
-        public Task UpdatePropertyAsync(string propertyName, dynamic propertyValue, string componentName = default, CancellationToken cts = default)
-            => UpdatePropertiesAsync(new Dictionary<string, dynamic> { { propertyName, propertyValue } }, componentName, cts);
+        /// <param name="cancellationToken"></param>
+        public Task UpdatePropertyAsync(string propertyName, dynamic propertyValue, string componentName = default, CancellationToken cancellationToken = default)
+            => UpdatePropertiesAsync(new Dictionary<string, dynamic> { { propertyName, propertyValue } }, componentName, cancellationToken);
+
 
         /// <summary>
-        /// Update a batch of properties.
-        /// 
-        /// Properties under the root component:
-        /// "reported": {
-        ///     "temperature": 21.3,
-        ///     "humudity": 60
-        /// }
-        /// 
-        /// Properties under a specified component:
-        /// "reported": {
-        ///     "thermostat1": {
-        ///         "__t": "c",
-        ///         "temperature": 21.3,
-        ///         "humudity": 60
-        ///     }
-        /// }
+        /// Update a collection of properties.
         /// </summary>
         /// <param name="properties">Reported properties to push</param>
         /// <param name="componentName"></param>
-        /// <param name="cts"></param>
-        public Task UpdatePropertiesAsync(IDictionary<string, dynamic> properties, string componentName = default, CancellationToken cts = default)
-            => InternalClient.UpdatePropertiesAsync(properties, componentName, cts);
+        /// <param name="cancellationToken"></param>
+        public Task UpdatePropertiesAsync(IDictionary<string, dynamic> properties, string componentName = default, CancellationToken cancellationToken = default)
+            => InternalClient.UpdatePropertiesAsync(properties, componentName, cancellationToken);
 
         /// <summary>
         /// Respond to a writable property request.
-        /// 
-        /// Property under the root component:
-        /// "reported": {
-        ///     "targetTemperature": {
-        ///         "value": 21.3,
-        ///         "ac": 200,
-        ///         "av": 3,
-        ///         "ad": "complete"
-        ///     }
-        /// }
-        /// 
-        /// Property under a specified component:
-        /// "reported": {
-        ///   "thermostat1": {
-        ///     "__t": "c",
-        ///     "targetTemperature": {
-        ///       "value": 23,
-        ///       "ac": 200,
-        ///       "av": 3,
-        ///       "ad": "complete"
-        ///     }
-        ///   }
-        /// }
         /// </summary>
         /// <param name="propertyName"></param>
         /// <param name="propertyValue"></param>
         /// <param name="componentName"></param>
-        /// <param name="cts"></param>
-        public Task UpdatePropertyAsync(string propertyName, WritableProperty propertyValue, string componentName = default, CancellationToken cts = default)
-            => InternalClient.UpdatePropertyAsync(propertyName, propertyValue, componentName, cts);
+        /// <param name="cancellationToken"></param>
+        public Task RespondToWritablePropertyEventAsync(string propertyName, dynamic propertyValue, string componentName = default, CancellationToken cancellationToken = default)
+            => InternalClient.UpdatePropertyAsync(propertyName, propertyValue, componentName, cancellationToken);
 
         /// <summary>
-        /// Set the writable property callback for all properties under the root component.
-        /// "desired" :
-        /// {
-        ///   "targetTemperature" : 21.3,
-        ///   "targetHumidity" : 80
-        /// },
-        /// "$version" : 3
-        /// 
-        /// RENAME => RespondTo indicates that we are actually returning a response from this method call.
-        /// 
+        /// Respond to a writable property request.
         /// </summary>
-        /// <param name="propertyActionAsTwinCollection"></param>
-        public void RespondToWritablePropertyEvent(Action<TwinCollection> propertyActionAsTwinCollection)
-            => InternalClient.SetWritablePropertyEvent(propertyActionAsTwinCollection);
-
-        /*/// <summary>
-        /// Set the writable property callback for a single property under the root component.
-        /// "desired" :
-        /// {
-        ///   "targetTemperature" : 21.3
-        /// },
-        /// "$version" : 3
-        /// 
-        /// RENAME => RespondTo indicates that we are actually returning a response from this method call.
-        /// VERSION => if service updates multiple properties, the same "desired property version" would be returned to multiple handlers.
-        /// 
-        /// </summary>
-        /// <param name="propertyName"></param>
-        /// <param name="propertyActionAsTwinCollection"></param>
-        public void RespondToWritablePropertyEvent(string propertyName, Action<string, TwinCollection> propertyActionAsTwinCollection)
-            => InternalClient.SetWritablePropertyEvent(propertyName, propertyActionAsTwinCollection);
-
-        /// <summary>
-        /// Set the writable property callback for all properties for the specified component.
-        /// "desired": {
-        ///   "thermostat1": {
-        ///     "__t": "c",
-        ///     "targetTemperature": 21.3,
-        ///     "targetHumidity": 80
-        ///   }
-        /// },
-        /// "$version" : 3
-        /// 
-        /// RENAME => RespondTo indicates that we are actually returning a response from this method call.
-        /// RENAME => Need to differentiate "respond to single property under root component" vs "respond to all properties under this component" 
-        ///           They have the same method signature.
-        ///           
-        /// </summary>
+        /// <param name="propertyCollection"></param>
         /// <param name="componentName"></param>
-        /// <param name="propertyActionAsTwinCollection"></param>
-        public void RespondToWritablePropertyEventPerComponent(string componentName, Action<string, TwinCollection> propertyActionAsTwinCollection)
-            => InternalClient.SetWritablePropertyEventPerComponent(componentName, propertyActionAsTwinCollection);
+        /// <param name="cancellationToken"></param>
+        public Task RespondToWritablePropertyEventAsync(IDictionary<string, WritableProperty> propertyCollection, string componentName = default, CancellationToken cancellationToken = default)
+            => InternalClient.UpdatePropertiesAsync((IDictionary<string, dynamic>)propertyCollection, componentName, cancellationToken);
 
         /// <summary>
-        /// Set the writable property callback for a specific property for the specified component.
-        /// "desired": {
-        ///   "thermostat1": {
-        ///     "__t": "c",
-        ///     "targetTemperature": 21.3
-        ///   }
-        /// },
-        /// "$version" : 3
-        /// 
-        /// RENAME => RespondTo indicates that we are actually returning a response from this method call.
-        /// 
+        /// Respond to a writable property request.
         /// </summary>
+        /// <param name="propertyCollection"></param>
         /// <param name="componentName"></param>
-        /// <param name="propertyName"></param>
-        /// <param name="propertyActionAsTwinCollection"></param>
-        public void RespondToWritablePropertyEvent(string componentName, string propertyName, Action<string, string, TwinCollection> propertyActionAsTwinCollection)
-            => InternalClient.SetWritablePropertyEvent(componentName, propertyName, propertyActionAsTwinCollection);*/
+        /// <param name="cancellationToken"></param>
+        public Task RespondToWritablePropertyEventAsync(TwinCollection propertyCollection, string componentName = default, CancellationToken cancellationToken = default)
+            => InternalClient.UpdatePropertiesAsync(propertyCollection, componentName, cancellationToken);
 
         /// <summary>
-        /// Send a single instance of telemetry.
+        /// Sets the global listener for Writable properties
         /// </summary>
-        /// <param name="telemetryName"></param>
-        /// <param name="telemetryValue"></param>
-        /// <param name="componentName"></param>
-        /// <param name="cts"></param>
-        public Task SendTelemetryAsync(string telemetryName, dynamic telemetryValue, string componentName = default, CancellationToken cts = default)
-            => SendTelemetryAsync(new Dictionary<string, dynamic> { { telemetryName, telemetryValue } }, componentName, cts);
+        /// <param name="callback"></param>
+        /// <param name="userContext"></param>
+        /// <param name="cancellationToken"></param>
+        public Task ListenToWritablePropertyEvent(Action<TwinCollection, object> callback, object userContext, CancellationToken cancellationToken = default)
+            => InternalClient.ListenToWritablePropertyEvent(callback, userContext, cancellationToken);
 
         /// <summary>
-        /// Send a batched instance of telemetry.
+        /// Sends a single instance of telemetry.
         /// </summary>
-        /// <param name="componentName"></param>
-        /// <param name="telemetryDictionary"></param>
-        /// <param name="cts"></param>
-        public Task SendTelemetryAsync(IDictionary<string, dynamic> telemetryDictionary, string componentName = default, CancellationToken cts = default)
-            => InternalClient.SendTelemetryAsync(telemetryDictionary, componentName, cts);
+        /// <param name="telemetryName">The name of the telemetry to send.</param>
+        /// <param name="telemetryValue">The value of the telemetry to send.</param>
+        /// <param name="conventionHandler">A convention handler that defines the content encoding and serializer to use for the telemetry message.</param>
+        /// <param name="componentName">The component name this telemetry belongs to.</param>
+        /// <param name="cancellationToken">A cancellation token.</param>
+        /// <remarks>
+        /// This will create a single telemetry message and will not combine multiple calls into one message. Use <seealso cref="SendTelemetryAsync(IDictionary{string, dynamic}, string, IConventionHandler, CancellationToken)"/>. Refer to the documentation for <see cref="IConventionHandler"/> if you want to use a custom serializer.
+        /// </remarks>
+        public Task SendTelemetryAsync(string telemetryName, dynamic telemetryValue, string componentName = default, IConventionHandler conventionHandler = default, CancellationToken cancellationToken = default)
+            => SendTelemetryAsync(new Dictionary<string, dynamic> { { telemetryName, telemetryValue } }, componentName, conventionHandler, cancellationToken);
 
         /// <summary>
-        /// Send a single instance of telemetry.
-        /// - specify encoding and content type in comments
+        /// Sends a collection of telemetry.
         /// </summary>
-        /// <param name="componentName"></param>
-        /// <param name="telemetryMessage"></param>
-        /// <param name="cts"></param>
+        /// <param name="telemetryDictionary">A dictionary of dynamic objects </param>
+        /// <param name="componentName">The component name this telemetry belongs to.</param>
+        /// <param name="conventionHandler">A convention handler that defines the content encoding and serializer to use for the telemetry message.</param>
+        /// <param name="cancellationToken">A cancellation token.</param>
+        /// /// <remarks>
+        /// This will either use the <see cref="DefaultTelemetryConventionHandler"/> to define the encoding and use the default Json serailzier. Refer to the documentation for <see cref="IConventionHandler"/> if you want to use a custom serializer.
+        /// </remarks>
+        public Task SendTelemetryAsync(IDictionary<string, dynamic> telemetryDictionary, string componentName = default, IConventionHandler conventionHandler = default, CancellationToken cancellationToken = default)
+            => InternalClient.SendTelemetryAsync(telemetryDictionary, componentName, conventionHandler, cancellationToken);
+
+        /// <summary>
+        /// Send telemetry using the specified message.
+        /// </summary>
+        /// <param name="telemetryMessage">The </param>
+        /// <param name="componentName">The component name this telemetry belongs to.</param>
+        /// <param name="conventionHandler">A convention handler that defines the content encoding and serializer to use for the telemetry message.</param>
+        /// <param name="cancellationToken">A cancellation token.</param>
 #pragma warning disable CA1062 // Validate arguments of public methods
-        public Task SendTelemetryAsync(Message telemetryMessage, string componentName = default, CancellationToken cts = default)
-            => InternalClient.SendTelemetryAsync(telemetryMessage, componentName, cts);
+        public Task SendTelemetryAsync(Message telemetryMessage, string componentName = default, IConventionHandler conventionHandler = default, CancellationToken cancellationToken = default)
+            => InternalClient.SendTelemetryAsync(telemetryMessage, componentName, conventionHandler, cancellationToken);
 #pragma warning restore CA1062 // Validate arguments of public methods
 
         /// <summary>
@@ -893,8 +797,18 @@ namespace Microsoft.Azure.Devices.Client
         /// <param name="commandCallback"></param>
         /// <param name="componentName"></param>
         /// <param name="userContext"></param>
-        /// <param name="cts"></param>
-        public Task SetCommandCallbackHandler(string commandName, Func<CommandRequest, object, Task<CommandResponse>> commandCallback, string componentName = default, object userContext = default, CancellationToken cts = default)
-            => InternalClient.SetCommandCallbackHandler(commandName, commandCallback, componentName, userContext, cts);
+        /// <param name="cancellationToken"></param>
+        public Task SetCommandCallbackHandler(string commandName, Func<CommandRequest, object, Task<CommandResponse>> commandCallback, string componentName = default, object userContext = default, CancellationToken cancellationToken = default)
+            => InternalClient.SetCommandCallbackHandler(commandName, commandCallback, componentName, userContext, cancellationToken);
+
+        /// <summary>
+        /// Set the global command callback handler. This handler will be called when no named handler was found for the command.
+        /// </summary>
+        /// <param name="commandCallback">A method implementation that will handle the incoming command.</param>
+        /// <param name="userContext">Generic parameter to be interpreted by the client code.</param>
+        /// <param name="cancellationToken">A cancellation token to cancel the operation.</param>
+        public Task SetCommandCallbackHandler(Func<CommandRequest, object, Task<CommandResponse>> commandCallback, object userContext = default, CancellationToken cancellationToken = default)
+            => InternalClient.SetCommandCallbackHandler(commandCallback, userContext, cancellationToken);
+        #endregion
     }
 }
