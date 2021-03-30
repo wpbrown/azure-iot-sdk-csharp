@@ -704,7 +704,6 @@ namespace Microsoft.Azure.Devices.Client
         public Task UpdatePropertyAsync(string propertyName, dynamic propertyValue, string componentName = default, CancellationToken cancellationToken = default)
             => UpdatePropertiesAsync(new Dictionary<string, dynamic> { { propertyName, propertyValue } }, componentName, cancellationToken);
 
-
         /// <summary>
         /// Update a collection of properties.
         /// </summary>
@@ -793,11 +792,14 @@ namespace Microsoft.Azure.Devices.Client
         /// <summary>
         /// Set command callback handler.
         /// </summary>
-        /// <param name="commandName"></param>
-        /// <param name="commandCallback"></param>
-        /// <param name="componentName"></param>
-        /// <param name="userContext"></param>
+        /// <param name="commandName">The name of the command this handler will be used for.</param>
+        /// <param name="commandCallback">The callback for this command.</param>
+        /// <param name="componentName">The component name this command belongs to.</param>
+        /// <param name="userContext">Generic parameter to be interpreted by the client code.</param>
         /// <param name="cancellationToken"></param>
+        /// <remarks>
+        /// The .NET SDK has a built in dispatcher that handles per command name routing. The SDK will first attempt to find the command by name. If it is found it will execute the callback for that specific command. If there is no entry found in the dispatcher the SDK will fall back to the global command handler <see cref="SetCommandCallbackHandler(Func{CommandRequest, object, Task{CommandResponse}}, object, CancellationToken)"/>.
+        /// </remarks>
         public Task SetCommandCallbackHandler(string commandName, Func<CommandRequest, object, Task<CommandResponse>> commandCallback, string componentName = default, object userContext = default, CancellationToken cancellationToken = default)
             => InternalClient.SetCommandCallbackHandler(commandName, commandCallback, componentName, userContext, cancellationToken);
 
@@ -807,6 +809,9 @@ namespace Microsoft.Azure.Devices.Client
         /// <param name="commandCallback">A method implementation that will handle the incoming command.</param>
         /// <param name="userContext">Generic parameter to be interpreted by the client code.</param>
         /// <param name="cancellationToken">A cancellation token to cancel the operation.</param>
+        /// <remarks>
+        /// The global command handler will be the fallback handler in the event there is nothing specified in the dispatcher. See the remarks in <see cref="SetCommandCallbackHandler(Func{CommandRequest, object, Task{CommandResponse}}, object, CancellationToken)"/> for more information.
+        /// </remarks>
         public Task SetCommandCallbackHandler(Func<CommandRequest, object, Task<CommandResponse>> commandCallback, object userContext = default, CancellationToken cancellationToken = default)
             => InternalClient.SetCommandCallbackHandler(commandCallback, userContext, cancellationToken);
         #endregion
