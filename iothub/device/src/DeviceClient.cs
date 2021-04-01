@@ -714,7 +714,7 @@ namespace Microsoft.Azure.Devices.Client
         /// <param name="propertyName">Property name.</param>
         /// <param name="propertyValue">Property value.</param>
         /// <param name="componentName">The component name this property belongs to.</param>
-        /// <param name="conventionHandler"></param>
+        /// <param name="conventionHandler">A convention handler that defines the content encoding and serializer to use for the properties.</param>
         /// <param name="cancellationToken">A cancellation token to cancel the operation.</param>
         public Task UpdatePropertyAsync(string propertyName, object propertyValue, string componentName = default, IConventionHandler conventionHandler = default, CancellationToken cancellationToken = default)
             => UpdatePropertiesAsync(new Dictionary<string, object> { { propertyName, propertyValue } }, componentName, conventionHandler, cancellationToken);
@@ -724,60 +724,27 @@ namespace Microsoft.Azure.Devices.Client
         /// </summary>
         /// <param name="properties">Reported properties to push.</param>
         /// <param name="componentName">The component name these properties belong to.</param>
-        /// <param name="conventionHandler"></param>
+        /// <param name="conventionHandler">A convention handler that defines the content encoding and serializer to use for the properties.</param>
         /// <param name="cancellationToken">A cancellation token to cancel the operation.</param>
         public Task UpdatePropertiesAsync(IDictionary<string, object> properties, string componentName = default, IConventionHandler conventionHandler = default, CancellationToken cancellationToken = default)
             => InternalClient.UpdatePropertiesAsync(properties, componentName, conventionHandler, cancellationToken);
 
-        ///// <summary>
-        ///// Respond to a writable property request.
-        ///// </summary>
-        ///// <param name="propertyName">Writable property name.</param>
-        ///// <param name="propertyValue">Writable property value.</param>
-        ///// <param name="componentName">The component name this writable property belongs to.</param>
-        ///// <param name="conventionHandler"></param>
-        ///// <param name="cancellationToken">A cancellation token to cancel the operation.</param>
-        //public Task UpdatePropertyAsync(string propertyName, WritablePropertyResponse propertyValue, string componentName = default, IConventionHandler conventionHandler = default, CancellationToken cancellationToken = default)
-        //    => InternalClient.UpdatePropertyAsync(propertyName, propertyValue, componentName, conventionHandler, cancellationToken);
-
-        ///// <summary>
-        ///// Respond to a writable property request.
-        ///// </summary>
-        ///// <param name="propertyCollection">A dictonary of writable properties</param>
-        ///// <param name="componentName">The component name this writable property belongs to.</param>
-        ///// <param name="conventionHandler"></param>
-        ///// <param name="cancellationToken">A cancellation token to cancel the operation.</param>
-        //public Task UpdatePropertiesAsync(IDictionary<string, WritablePropertyResponse> propertyCollection, string componentName = default, IConventionHandler conventionHandler = default, CancellationToken cancellationToken = default)
-        //    => InternalClient.UpdatePropertiesAsync((IDictionary<string, object>)propertyCollection, componentName, conventionHandler, cancellationToken);
-
-        ///// <summary>
-        ///// ASK =====
-        ///// ASK Do we want to keep the TwinCollection version of this?
-        ///// ASK =====
-        ///// Respond to a writable property request.
-        ///// </summary>
-        ///// <param name="propertyCollection">A twin collection with writable properties.</param>
-        ///// <param name="cancellationToken">A cancellation token to cancel the operation.</param>
-        //public Task SubscribeToWritablePropertyEvent(TwinCollection propertyCollection, CancellationToken cancellationToken = default)
-        //    => InternalClient.UpdatePropertiesAsync(propertyCollection, cancellationToken);
-
         /// <summary>
         /// Sets the global listener for Writable properties
         /// </summary>
         /// <param name="callback">The global call back to handle all writable property updates.</param>
-        /// <param name="userContext"></param>
-        /// <param name="cancellationToken"></param>
+        /// <param name="userContext">Generic parameter to be interpreted by the client code.</param>
+        /// <param name="cancellationToken">A cancellation token.</param>
         public Task SubscribeToWritablePropertyEvent(Action<Properties, object> callback, object userContext, CancellationToken cancellationToken = default)
             => SubscribeToWritablePropertyEvent(callback, default, userContext, cancellationToken);
 
-
         /// <summary>
         /// Sets the global listener for Writable properties
         /// </summary>
         /// <param name="callback">The global call back to handle all writable property updates.</param>
-        /// <param name="componentName"></param>
-        /// <param name="userContext"></param>
-        /// <param name="cancellationToken"></param>
+        /// <param name="componentName">The component name this writable property belongs to.</param>
+        /// <param name="userContext">Generic parameter to be interpreted by the client code.</param>
+        /// <param name="cancellationToken">A cancellation token.</param>
         public Task SubscribeToWritablePropertyEvent(Action<Properties, object> callback, string componentName = default, object userContext = default, CancellationToken cancellationToken = default)
             => InternalClient.SubscribeToWritablePropertyEvent(callback, componentName, userContext, cancellationToken);
 
@@ -811,7 +778,10 @@ namespace Microsoft.Azure.Devices.Client
         /// <summary>
         /// Send telemetry using the specified message.
         /// </summary>
-        /// <param name="telemetryMessage">The </param>
+        /// <remarks>
+        /// Use this method when you need to define custom properties for the message.
+        /// </remarks>
+        /// <param name="telemetryMessage">The custom implemented telemetry message</param>
         /// <param name="componentName">The component name this telemetry belongs to.</param>
         /// <param name="cancellationToken">A cancellation token.</param>
         public Task SendTelemetryAsync(Message telemetryMessage, string componentName = default, CancellationToken cancellationToken = default)

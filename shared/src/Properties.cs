@@ -23,8 +23,8 @@ namespace Microsoft.Azure.Devices.Shared
         /// <summary>
         /// Initializes a new instance of <see cref="Properties"/> with the specified collections
         /// </summary>
-        /// <param name="writablePropertyCollection"></param>
-        /// <param name="readOnlyPropertyCollection"></param>
+        /// <param name="writablePropertyCollection">A collection of writable properties returned from IoT Hub</param>
+        /// <param name="readOnlyPropertyCollection">A collection of read-only properties returned from IoT Hub</param>
         public Properties(PropertyCollection writablePropertyCollection, PropertyCollection readOnlyPropertyCollection)
         {
             Writable = writablePropertyCollection;
@@ -35,10 +35,10 @@ namespace Microsoft.Azure.Devices.Shared
         /// Gets and sets the writable properties.
         /// </summary>
         [JsonProperty(PropertyName = "desired", DefaultValueHandling = DefaultValueHandling.Ignore)]
-        public PropertyCollection Writable { get; set; }
+        public PropertyCollection Writable { get; private set; }
 
         /// <summary>
-        /// Get the property from 
+        /// Get the property from the propeties collection
         /// </summary>
         /// <param name="propertyName"></param>
         /// <returns></returns>
@@ -53,7 +53,7 @@ namespace Microsoft.Azure.Devices.Shared
         /// <summary>
         /// Converts a <see cref="TwinProperties"/> collection to a properties collection
         /// </summary>
-        /// <param name="twinProperties"></param>
+        /// <param name="twinProperties">The TwinProperties object to convert</param>
         /// <returns></returns>
         public static Properties FromTwinProperties(TwinProperties twinProperties)
         {
