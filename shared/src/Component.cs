@@ -27,7 +27,7 @@ namespace Microsoft.Azure.Devices.Shared
         /// <summary>
         /// 
         /// </summary>
-        public IDictionary<string, Action<string, string, WritableProperty>> WritablePropertyCallbacks { get; private set; } = new Dictionary<string, Action<string, string, WritableProperty>>();
+        public IDictionary<string, Action<string, string, WritablePropertyResponse>> WritablePropertyCallbacks { get; private set; } = new Dictionary<string, Action<string, string, WritablePropertyResponse>>();
 
         /// <summary>
         /// 
@@ -50,7 +50,7 @@ namespace Microsoft.Azure.Devices.Shared
         /// <param name="propertyName"></param>
         /// <param name="propertyValue"></param>
         /// <param name="properyCallback"></param>
-        public void AddExternallyWritableProperty(string propertyName, TwinCollection propertyValue, Action<string, string, WritableProperty> properyCallback = default)
+        public void AddExternallyWritableProperty(string propertyName, TwinCollection propertyValue, Action<string, string, WritablePropertyResponse> properyCallback = default)
         {
             if (!string.IsNullOrEmpty(propertyName ?? throw new ArgumentNullException(nameof(propertyName), "You must specify a non-null property name to be added to the externally writable properties collection.")))
             {

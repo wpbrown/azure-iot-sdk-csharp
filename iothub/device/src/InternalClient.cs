@@ -2039,8 +2039,9 @@ namespace Microsoft.Azure.Devices.Client
 
         #region Convention driven implementation
 
-        internal Task UpdatePropertiesAsync(IDictionary<string, object> properties, string componentName, CancellationToken cancellationToken)
+        internal Task UpdatePropertiesAsync(IDictionary<string, object> properties, string componentName, IConventionHandler conventionHandler = default,  CancellationToken cancellationToken = default)
         {
+            conventionHandler ??= DefaultConvention.Instance;
             if (properties == null)
             {
                 throw new ArgumentNullException(nameof(properties));
@@ -2059,22 +2060,21 @@ namespace Microsoft.Azure.Devices.Client
             TwinCollection twinCollection = null;
             if (!string.IsNullOrEmpty(componentName) && !string.IsNullOrWhiteSpace(componentName))
             {
-                propertyDictionary.Add(DefaultConvention.Instance.ComponentIdentifierKey, DefaultConvention.Instance.ComponentIdentifierValue);
+                propertyDictionary.Add(conventionHandler.ComponentIdentifierKey, conventionHandler.ComponentIdentifierValue);
                 var componentDictionary = new Dictionary<string, Dictionary<string, object>>();
                 componentDictionary.Add(componentName, propertyDictionary);
-                twinCollection = new TwinCollection(Newtonsoft.Json.JsonConvert.SerializeObject(componentDictionary));
+                twinCollection = new TwinCollection(conventionHandler.SerializeToString(componentDictionary));
             }
             else
             {
-                twinCollection = new TwinCollection(Newtonsoft.Json.JsonConvert.SerializeObject(propertyDictionary));
+                twinCollection = new TwinCollection(conventionHandler.SerializeToString(propertyDictionary));
             }
             return UpdateReportedPropertiesAsync(twinCollection, cancellationToken);
-
         }
 
-        internal Task UpdatePropertyAsync(string propertyName, WritableProperty propertyValue, string componentName, CancellationToken cancellationToken)
+        internal Task UpdatePropertyAsync(string propertyName, WritablePropertyResponse propertyValue, string componentName, IConventionHandler conventionHandler, CancellationToken cancellationToken)
         {
-            return UpdatePropertiesAsync(new Dictionary<string, object> { [propertyName] = propertyValue }, componentName, cancellationToken);
+            return UpdatePropertiesAsync(new Dictionary<string, object> { [propertyName] = propertyValue }, componentName, conventionHandler, cancellationToken);
         }
 
         internal Task SendTelemetryAsync(IDictionary<string, object> telemetryDictionary, string componentName, IConventionHandler telemetrySerializer, CancellationToken cts)
@@ -2089,8 +2089,8 @@ namespace Microsoft.Azure.Devices.Client
             if (telemetryMessage == null)
             {
                 throw new ArgumentNullException(nameof(telemetryMessage));
-
             }
+
             telemetryMessage.ComponentName ??= componentName;
             telemetryMessage.ContentType ??= DefaultConvention.Instance.ContentType;
             telemetryMessage.ContentEncoding ??= DefaultConvention.Instance?.ContentEncoding.WebName;
@@ -2118,11 +2118,13 @@ namespace Microsoft.Azure.Devices.Client
         }
 
         [System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2008:Do not create tasks without passing a TaskScheduler", Justification = "<Pending>")]
-        internal Task ListenToWritablePropertyEvent(Action<TwinCollection, object> callback, object userContext, CancellationToken cancellationToken)
+        internal Task SubscribeToWritablePropertyEvent(Action<Properties, object> callback, string componentName, object userContext, CancellationToken cancellationToken)
         {
+            // TODO implement dispatcher
+            string dispatcherTodo = componentName;
             var desiredPropertyUpdate = new DesiredPropertyUpdateCallback((twinCollection, context) =>
             {
-                callback(twinCollection, context);
+                callback(new Properties((PropertyCollection)twinCollection, null), context);
                 return Task.Factory.StartNew(() => { }, cancellationToken);
             });
             return SetDesiredPropertyUpdateCallbackAsync(desiredPropertyUpdate, userContext, cancellationToken);
@@ -2131,6 +2133,19 @@ namespace Microsoft.Azure.Devices.Client
         internal Task UpdatePropertiesAsync(TwinCollection propertyCollection, CancellationToken cancellationToken)
         {
             return UpdateReportedPropertiesAsync(propertyCollection, cancellationToken);
+        }
+
+        internal Task<Properties> GetProperties(CancellationToken cancellationToken)
+        {
+            try
+            {
+                return Task.FromResult(Properties.FromTwinProperties(InnerHandler.SendTwinGetAsync(cancellationToken).Result.Properties));
+            }
+            catch (IotHubCommunicationException ex) when (ex.InnerException is OperationCanceledException)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+                throw;
+            }
         }
 
         #endregion
