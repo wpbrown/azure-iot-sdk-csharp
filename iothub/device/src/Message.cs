@@ -91,12 +91,12 @@ namespace Microsoft.Azure.Devices.Client
         }
 
         /// <summary>
-        /// Constructor which uses the <see cref="DefaultTelemetryConventionHandler"/> to serialize the message payload passed in as an object.
+        /// Constructor which uses the <see cref="DefaultConvention"/> to serialize the message payload passed in as an object.
         /// </summary>
-        /// <remarks>The <see cref="DefaultTelemetryConventionHandler"/> will encode the message using the <see cref="Newtonsoft.Json.JsonConvert.SerializeObject(object?)"/> method to serialize your object. Please ensure the object(s) to be serialized are handled correctly.</remarks>
+        /// <remarks>The <see cref="DefaultConvention"/> will encode the message using the <see cref="Newtonsoft.Json.JsonConvert.SerializeObject(object?)"/> method to serialize your object. Please ensure the object(s) to be serialized are handled correctly.</remarks>
         /// <param name="messagePayload"></param>
         public Message(object messagePayload)
-            : this(DefaultTelemetryConventionHandler.Instance, messagePayload)
+            : this(DefaultConvention.Instance, messagePayload)
         {
         }
 

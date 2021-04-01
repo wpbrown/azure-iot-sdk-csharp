@@ -25,12 +25,12 @@ namespace Microsoft.Azure.Devices.Shared
         /// <summary>
         /// The key for a component identifier within a property update patch. Corresponding value is <see cref="ComponentIdentifierValue"/>.
         /// </summary>
-        static string ComponentIdentifierKey { get; }
+        string ComponentIdentifierKey { get; set; }
 
         /// <summary>
         /// The value for a component identifier within a property update patch. Corresponding key is <see cref="ComponentIdentifierKey"/>.
         /// </summary>
-        static string ComponentIdentifierValue { get; }
+        string ComponentIdentifierValue { get; set; }
 
         /// <summary>
         /// Used by the Message class to specify what encoding to expect

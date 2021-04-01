@@ -19,10 +19,10 @@ namespace Microsoft.Azure.Devices.Shared
         public static readonly DefaultConvention Instance = new DefaultConvention();
 
         /// <inheritdoc/>
-        public static  string ComponentIdentifierKey => "__t";
+        public string ComponentIdentifierKey { get { return "__t";  } set { } }
 
         /// <inheritdoc/>
-        public static string ComponentIdentifierValue => "c";
+        public string ComponentIdentifierValue { get { return "c"; } set { } }
 
         /// <inheritdoc/>
         public Encoding ContentEncoding { get; set; } = Encoding.UTF8;

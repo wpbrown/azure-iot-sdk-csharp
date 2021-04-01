@@ -692,43 +692,51 @@ namespace Microsoft.Azure.Devices.Client
         public Task UpdateReportedPropertiesAsync(TwinCollection reportedProperties) =>
             InternalClient.UpdateReportedPropertiesAsync(reportedProperties);
 
+        /// <summary>
+        /// Push reported property changes up to the service.
+        /// </summary>
+        /// <param name="reportedProperties">Reported properties to push</param>
+        /// <param name="cancellationToken">A cancellation token to cancel the operation.</param>
+        public Task UpdateReportedPropertiesAsync(TwinCollection reportedProperties, CancellationToken cancellationToken) =>
+            InternalClient.UpdateReportedPropertiesAsync(reportedProperties, cancellationToken);
+
         #region Convention driven commands
 
         /// <summary>
         /// Update a single property.
         /// </summary>
-        /// <param name="propertyName"></param>
-        /// <param name="propertyValue"></param>
-        /// <param name="componentName"></param>
-        /// <param name="cancellationToken"></param>
+        /// <param name="propertyName">Property name.</param>
+        /// <param name="propertyValue">Property value.</param>
+        /// <param name="componentName">The component name this property belongs to.</param>
+        /// <param name="cancellationToken">A cancellation token to cancel the operation.</param>
         public Task UpdatePropertyAsync(string propertyName, object propertyValue, string componentName = default, CancellationToken cancellationToken = default)
             => UpdatePropertiesAsync(new Dictionary<string, object> { { propertyName, propertyValue } }, componentName, cancellationToken);
 
         /// <summary>
         /// Update a collection of properties.
         /// </summary>
-        /// <param name="properties">Reported properties to push</param>
-        /// <param name="componentName"></param>
-        /// <param name="cancellationToken"></param>
+        /// <param name="properties">Reported properties to push.</param>
+        /// <param name="componentName">The component name these properties belong to.</param>
+        /// <param name="cancellationToken">A cancellation token to cancel the operation.</param>
         public Task UpdatePropertiesAsync(IDictionary<string, object> properties, string componentName = default, CancellationToken cancellationToken = default)
             => InternalClient.UpdatePropertiesAsync(properties, componentName, cancellationToken);
 
         /// <summary>
         /// Respond to a writable property request.
         /// </summary>
-        /// <param name="propertyName"></param>
-        /// <param name="propertyValue"></param>
-        /// <param name="componentName"></param>
-        /// <param name="cancellationToken"></param>
+        /// <param name="propertyName">Writable property name.</param>
+        /// <param name="propertyValue">Writable property value.</param>
+        /// <param name="componentName">The component name this writable property belongs to.</param>
+        /// <param name="cancellationToken">A cancellation token to cancel the operation.</param>
         public Task RespondToWritablePropertyEventAsync(string propertyName, WritableProperty propertyValue, string componentName = default, CancellationToken cancellationToken = default)
             => InternalClient.UpdatePropertyAsync(propertyName, propertyValue, componentName, cancellationToken);
 
         /// <summary>
         /// Respond to a writable property request.
         /// </summary>
-        /// <param name="propertyCollection"></param>
-        /// <param name="componentName"></param>
-        /// <param name="cancellationToken"></param>
+        /// <param name="propertyCollection">A dictonary of writable properties</param>
+        /// <param name="componentName">The component name this writable property belongs to.</param>
+        /// <param name="cancellationToken">A cancellation token to cancel the operation.</param>
         public Task RespondToWritablePropertyEventAsync(IDictionary<string, WritableProperty> propertyCollection, string componentName = default, CancellationToken cancellationToken = default)
             => InternalClient.UpdatePropertiesAsync((IDictionary<string, object>)propertyCollection, componentName, cancellationToken);
 
@@ -738,15 +746,15 @@ namespace Microsoft.Azure.Devices.Client
         /// ASK =====
         /// Respond to a writable property request.
         /// </summary>
-        /// <param name="propertyCollection"></param>
-        /// <param name="cancellationToken"></param>
+        /// <param name="propertyCollection">A twin collection with writable properties.</param>
+        /// <param name="cancellationToken">A cancellation token to cancel the operation.</param>
         public Task RespondToWritablePropertyEventAsync(TwinCollection propertyCollection, CancellationToken cancellationToken = default)
             => InternalClient.UpdatePropertiesAsync(propertyCollection, cancellationToken);
 
         /// <summary>
         /// Sets the global listener for Writable properties
         /// </summary>
-        /// <param name="callback"></param>
+        /// <param name="callback">The global call back to handle all writable property updates.</param>
         /// <param name="userContext"></param>
         /// <param name="cancellationToken"></param>
         public Task ListenToWritablePropertyEvent(Action<TwinCollection, object> callback, object userContext, CancellationToken cancellationToken = default)
@@ -785,10 +793,8 @@ namespace Microsoft.Azure.Devices.Client
         /// <param name="telemetryMessage">The </param>
         /// <param name="componentName">The component name this telemetry belongs to.</param>
         /// <param name="cancellationToken">A cancellation token.</param>
-#pragma warning disable CA1062 // Validate arguments of public methods
         public Task SendTelemetryAsync(Message telemetryMessage, string componentName = default, CancellationToken cancellationToken = default)
-            => InternalClient.SendTelemetryAsync(telemetryMessage, componentName, cancellationToken);
-#pragma warning restore CA1062 // Validate arguments of public methods
+            => InternalClient.SendTelemetryAsync(telemetryMessage ?? throw new ArgumentNullException(nameof(telemetryMessage)), componentName, cancellationToken);
 
         /// <summary>
         /// Set command callback handler.
@@ -799,10 +805,10 @@ namespace Microsoft.Azure.Devices.Client
         /// <param name="userContext">Generic parameter to be interpreted by the client code.</param>
         /// <param name="cancellationToken"></param>
         /// <remarks>
-        /// The .NET SDK has a built in dispatcher that handles per command name routing. The SDK will first attempt to find the command by name. If it is found it will execute the callback for that specific command. If there is no entry found in the dispatcher the SDK will fall back to the global command handler <see cref="SetCommandCallbackHandler(Func{CommandRequest, object, Task{CommandResponse}}, object, CancellationToken)"/>.
+        /// The .NET SDK has a built in dispatcher that handles per command name routing. The SDK will first attempt to find the command by name. If it is found it will execute the callback for that specific command. If there is no entry found in the dispatcher the SDK will fall back to the global command handler <see cref="SetCommandCallbackHandlerAsync(Func{CommandRequest, object, Task{CommandResponse}}, object, CancellationToken)"/>.
         /// </remarks>
-        public Task SetCommandCallbackHandler(string commandName, Func<CommandRequest, object, Task<CommandResponse>> commandCallback, string componentName = default, object userContext = default, CancellationToken cancellationToken = default)
-            => InternalClient.SetCommandCallbackHandler(commandName, commandCallback, componentName, userContext, cancellationToken);
+        public Task SetCommandCallbackHandlerAsync(string commandName, Func<CommandRequest, object, Task<CommandResponse>> commandCallback, string componentName = default, object userContext = default, CancellationToken cancellationToken = default)
+            => InternalClient.SetCommandCallbackHandlerAsync(commandName, commandCallback, componentName, userContext, cancellationToken);
 
         /// <summary>
         /// Set the global command callback handler. This handler will be called when no named handler was found for the command.
@@ -811,10 +817,10 @@ namespace Microsoft.Azure.Devices.Client
         /// <param name="userContext">Generic parameter to be interpreted by the client code.</param>
         /// <param name="cancellationToken">A cancellation token to cancel the operation.</param>
         /// <remarks>
-        /// The global command handler will be the fallback handler in the event there is nothing specified in the dispatcher. See the remarks in <see cref="SetCommandCallbackHandler(Func{CommandRequest, object, Task{CommandResponse}}, object, CancellationToken)"/> for more information.
+        /// The global command handler will be the fallback handler in the event there is nothing specified in the dispatcher. See the remarks in <see cref="SetCommandCallbackHandlerAsync(Func{CommandRequest, object, Task{CommandResponse}}, object, CancellationToken)"/> for more information.
         /// </remarks>
-        public Task SetCommandCallbackHandler(Func<CommandRequest, object, Task<CommandResponse>> commandCallback, object userContext = default, CancellationToken cancellationToken = default)
-            => InternalClient.SetCommandCallbackHandler(commandCallback, userContext, cancellationToken);
+        public Task SetCommandCallbackHandlerAsync(Func<CommandRequest, object, Task<CommandResponse>> commandCallback, object userContext = default, CancellationToken cancellationToken = default)
+            => InternalClient.SetCommandCallbackHandlerAsync(commandCallback, userContext, cancellationToken);
         #endregion
     }
 }

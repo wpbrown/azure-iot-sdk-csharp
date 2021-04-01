@@ -2059,7 +2059,7 @@ namespace Microsoft.Azure.Devices.Client
             TwinCollection twinCollection = null;
             if (!string.IsNullOrEmpty(componentName) && !string.IsNullOrWhiteSpace(componentName))
             {
-                propertyDictionary.Add(DefaultConvention.ComponentIdentifierKey, DefaultConvention.ComponentIdentifierValue);
+                propertyDictionary.Add(DefaultConvention.Instance.ComponentIdentifierKey, DefaultConvention.Instance.ComponentIdentifierValue);
                 var componentDictionary = new Dictionary<string, Dictionary<string, object>>();
                 componentDictionary.Add(componentName, propertyDictionary);
                 twinCollection = new TwinCollection(Newtonsoft.Json.JsonConvert.SerializeObject(componentDictionary));
@@ -2086,13 +2086,18 @@ namespace Microsoft.Azure.Devices.Client
 
         internal Task SendTelemetryAsync(Message telemetryMessage, string componentName, CancellationToken cts)
         {
+            if (telemetryMessage == null)
+            {
+                throw new ArgumentNullException(nameof(telemetryMessage));
+
+            }
             telemetryMessage.ComponentName ??= componentName;
             telemetryMessage.ContentType ??= DefaultConvention.Instance.ContentType;
             telemetryMessage.ContentEncoding ??= DefaultConvention.Instance?.ContentEncoding.WebName;
             return SendEventAsync(telemetryMessage, cts);
         }
 
-        internal Task SetCommandCallbackHandler(string commandName, Func<CommandRequest, object, Task<CommandResponse>> commandCallback, string componentName, object userContext, CancellationToken cancellationToken)
+        internal Task SetCommandCallbackHandlerAsync(string commandName, Func<CommandRequest, object, Task<CommandResponse>> commandCallback, string componentName, object userContext, CancellationToken cancellationToken)
         {
             commandName = string.IsNullOrEmpty(componentName) && string.IsNullOrWhiteSpace(componentName) ? commandName : $"{componentName}*{commandName}";
 
@@ -2103,7 +2108,7 @@ namespace Microsoft.Azure.Devices.Client
             return SetMethodHandlerAsync(commandName, methodCallback, userContext, cancellationToken);
         }
 
-        internal Task SetCommandCallbackHandler(Func<CommandRequest, object, Task<CommandResponse>> commandCallback, object userContext, CancellationToken cancellationToken)
+        internal Task SetCommandCallbackHandlerAsync(Func<CommandRequest, object, Task<CommandResponse>> commandCallback, object userContext, CancellationToken cancellationToken)
         {
             var methodCallback = new MethodCallback((methReq, context) =>
             {
@@ -2112,12 +2117,13 @@ namespace Microsoft.Azure.Devices.Client
             return SetMethodDefaultHandlerAsync(methodCallback, userContext, cancellationToken);
         }
 
+        [System.Diagnostics.CodeAnalysis.SuppressMessage("Reliability", "CA2008:Do not create tasks without passing a TaskScheduler", Justification = "<Pending>")]
         internal Task ListenToWritablePropertyEvent(Action<TwinCollection, object> callback, object userContext, CancellationToken cancellationToken)
         {
             var desiredPropertyUpdate = new DesiredPropertyUpdateCallback((twinCollection, context) =>
             {
                 callback(twinCollection, context);
-                return Task.CompletedTask;
+                return Task.Factory.StartNew(() => { }, cancellationToken);
             });
             return SetDesiredPropertyUpdateCallbackAsync(desiredPropertyUpdate, userContext, cancellationToken);
         }

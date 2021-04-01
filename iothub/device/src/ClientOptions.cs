@@ -33,6 +33,6 @@ namespace Microsoft.Azure.Devices.Client
         /// <summary>
         /// The default telemetry convention handler used when sending telemetry with the <see cref="DeviceClient.SendTelemetryAsync(string, dynamic, string, IConventionHandler, System.Threading.CancellationToken)" />
         /// </summary>
-        public IConventionHandler TelemetryConventionHandler { get; set; } = DefaultTelemetryConventionHandler.Instance;
+        public IConventionHandler TelemetryConventionHandler { get; set; } = DefaultConvention.Instance;
     }
 }
