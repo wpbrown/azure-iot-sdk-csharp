@@ -2039,7 +2039,7 @@ namespace Microsoft.Azure.Devices.Client
 
         #region Convention driven implementation
 
-        internal Task UpdatePropertiesAsync(IDictionary<string, object> properties, string componentName, CancellationToken cts)
+        internal Task UpdatePropertiesAsync(IDictionary<string, object> properties, string componentName, CancellationToken cancellationToken)
         {
             if (properties == null)
             {
@@ -2068,13 +2068,13 @@ namespace Microsoft.Azure.Devices.Client
             {
                 twinCollection = new TwinCollection(Newtonsoft.Json.JsonConvert.SerializeObject(propertyDictionary));
             }
-            return UpdateReportedPropertiesAsync(twinCollection, cts);
+            return UpdateReportedPropertiesAsync(twinCollection, cancellationToken);
 
         }
 
-        internal Task UpdatePropertyAsync(string propertyName, WritableProperty propertyValue, string componentName, CancellationToken cts)
+        internal Task UpdatePropertyAsync(string propertyName, WritableProperty propertyValue, string componentName, CancellationToken cancellationToken)
         {
-            return UpdatePropertiesAsync(new Dictionary<string, object> { [propertyName] = propertyValue }, componentName, cts);
+            return UpdatePropertiesAsync(new Dictionary<string, object> { [propertyName] = propertyValue }, componentName, cancellationToken);
         }
 
         internal Task SendTelemetryAsync(IDictionary<string, object> telemetryDictionary, string componentName, IConventionHandler telemetrySerializer, CancellationToken cts)
@@ -2092,7 +2092,7 @@ namespace Microsoft.Azure.Devices.Client
             return SendEventAsync(telemetryMessage, cts);
         }
 
-        internal Task SetCommandCallbackHandler(string commandName, Func<CommandRequest, object, Task<CommandResponse>> commandCallback, string componentName, object userContext, CancellationToken cts)
+        internal Task SetCommandCallbackHandler(string commandName, Func<CommandRequest, object, Task<CommandResponse>> commandCallback, string componentName, object userContext, CancellationToken cancellationToken)
         {
             commandName = string.IsNullOrEmpty(componentName) && string.IsNullOrWhiteSpace(componentName) ? commandName : $"{componentName}*{commandName}";
 
@@ -2100,26 +2100,31 @@ namespace Microsoft.Azure.Devices.Client
             {
                 return Task.FromResult<MethodResponse>(commandCallback((CommandRequest)methReq, context).Result);
             });
-            return SetMethodHandlerAsync(commandName, methodCallback, userContext, cts);
+            return SetMethodHandlerAsync(commandName, methodCallback, userContext, cancellationToken);
         }
 
-        internal Task SetCommandCallbackHandler(Func<CommandRequest, object, Task<CommandResponse>> commandCallback, object userContext, CancellationToken cts)
+        internal Task SetCommandCallbackHandler(Func<CommandRequest, object, Task<CommandResponse>> commandCallback, object userContext, CancellationToken cancellationToken)
         {
             var methodCallback = new MethodCallback((methReq, context) =>
             {
                 return Task.FromResult<MethodResponse>(commandCallback((CommandRequest)methReq, context).Result);
             });
-            return SetMethodDefaultHandlerAsync(methodCallback, userContext, cts);
+            return SetMethodDefaultHandlerAsync(methodCallback, userContext, cancellationToken);
         }
 
-        internal Task ListenToWritablePropertyEvent(object propertyCollection, object componentName, CancellationToken cancellationToken)
+        internal Task ListenToWritablePropertyEvent(Action<TwinCollection, object> callback, object userContext, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            var desiredPropertyUpdate = new DesiredPropertyUpdateCallback((twinCollection, context) =>
+            {
+                callback(twinCollection, context);
+                return Task.CompletedTask;
+            });
+            return SetDesiredPropertyUpdateCallbackAsync(desiredPropertyUpdate, userContext, cancellationToken);
         }
 
-        internal Task UpdatePropertiesAsync(TwinCollection propertyCollection, string componentName, CancellationToken cancellationToken)
+        internal Task UpdatePropertiesAsync(TwinCollection propertyCollection, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            return UpdateReportedPropertiesAsync(propertyCollection, cancellationToken);
         }
 
         #endregion

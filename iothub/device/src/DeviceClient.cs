@@ -739,10 +739,9 @@ namespace Microsoft.Azure.Devices.Client
         /// Respond to a writable property request.
         /// </summary>
         /// <param name="propertyCollection"></param>
-        /// <param name="componentName"></param>
         /// <param name="cancellationToken"></param>
-        public Task RespondToWritablePropertyEventAsync(TwinCollection propertyCollection, string componentName = default, CancellationToken cancellationToken = default)
-            => InternalClient.UpdatePropertiesAsync(propertyCollection, componentName, cancellationToken);
+        public Task RespondToWritablePropertyEventAsync(TwinCollection propertyCollection, CancellationToken cancellationToken = default)
+            => InternalClient.UpdatePropertiesAsync(propertyCollection, cancellationToken);
 
         /// <summary>
         /// Sets the global listener for Writable properties
