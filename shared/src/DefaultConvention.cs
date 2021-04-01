@@ -8,15 +8,21 @@ using Newtonsoft.Json;
 namespace Microsoft.Azure.Devices.Shared
 {
     /// <inheritdoc/>
-    public class DefaultTelemetryConventionHandler
+    public class DefaultConvention
         : IConventionHandler
     {
-        private DefaultTelemetryConventionHandler() { }
+        private DefaultConvention() { }
 
         /// <summary>
         /// Default instance 
         /// </summary>
-        public static readonly DefaultTelemetryConventionHandler Instance = new DefaultTelemetryConventionHandler();
+        public static readonly DefaultConvention Instance = new DefaultConvention();
+
+        /// <inheritdoc/>
+        public static  string ComponentIdentifierKey => "__t";
+
+        /// <inheritdoc/>
+        public static string ComponentIdentifierValue => "c";
 
         /// <inheritdoc/>
         public Encoding ContentEncoding { get; set; } = Encoding.UTF8;

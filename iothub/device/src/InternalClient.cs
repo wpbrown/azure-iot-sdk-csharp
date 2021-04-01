@@ -1018,7 +1018,7 @@ namespace Microsoft.Azure.Devices.Client
                     methodResponseInternal?.Dispose();
                 }
                 finally
-                { 
+                {
                     // Need to release this semaphore even if the above dispose call fails
                     _methodsDictionarySemaphore.Release();
                 }
@@ -1070,7 +1070,7 @@ namespace Microsoft.Azure.Devices.Client
             }
         }
 
-        
+
 
         internal Task SendMethodResponseAsync(MethodResponseInternal methodResponse, CancellationToken cancellationToken)
         {
@@ -1271,7 +1271,7 @@ namespace Microsoft.Azure.Devices.Client
         /// <param name="cancellationToken">A cancellation token that can be used by other objects or threads to receive notice of cancellation.</param>
         public Task UpdateReportedPropertiesAsync(TwinCollection componentProperties, string componentName, CancellationToken cancellationToken)
         {
-            
+
             // Codes_SRS_DEVICECLIENT_18_006: `UpdateReportedPropertiesAsync` shall throw an `ArgumentNull` exception if `reportedProperties` is null
             if (componentProperties == null)
             {
@@ -1305,7 +1305,7 @@ namespace Microsoft.Azure.Devices.Client
         public Task SendTelemetryAsync(string serializedTelemetry, CancellationToken cancellationToken)
         {
             using var message = new Message(Encoding.UTF8.GetBytes(serializedTelemetry));
-            message.ContentType =  "application/json";
+            message.ContentType = "application/json";
             message.ContentEncoding = "utf-8";
             return this.SendEventAsync(message, cancellationToken);
         }
@@ -2037,48 +2037,79 @@ namespace Microsoft.Azure.Devices.Client
             return cts;
         }
 
-        #region PnP Convention
+        #region Convention driven implementation
 
-        internal Task UpdatePropertiesAsync(IDictionary<string, dynamic> properties, string componentName, CancellationToken cts)
+        internal Task UpdatePropertiesAsync(IDictionary<string, object> properties, string componentName, CancellationToken cts)
         {
-            throw new NotImplementedException();
+            if (properties == null)
+            {
+                throw new ArgumentNullException(nameof(properties));
+            }
+
+            var propertyDictionary = new Dictionary<string, object>();
+            foreach (var kvp in properties)
+            {
+                if (string.IsNullOrWhiteSpace(kvp.Key))
+                {
+                    throw new ArgumentNullException(nameof(kvp.Key), $"One of the propertyPairs keys was null, empty, or white space.");
+                }
+                propertyDictionary.Add(kvp.Key, kvp.Value);
+            }
+
+            TwinCollection twinCollection = null;
+            if (!string.IsNullOrEmpty(componentName) && !string.IsNullOrWhiteSpace(componentName))
+            {
+                propertyDictionary.Add(DefaultConvention.ComponentIdentifierKey, DefaultConvention.ComponentIdentifierValue);
+                var componentDictionary = new Dictionary<string, Dictionary<string, object>>();
+                componentDictionary.Add(componentName, propertyDictionary);
+                twinCollection = new TwinCollection(Newtonsoft.Json.JsonConvert.SerializeObject(componentDictionary));
+            }
+            else
+            {
+                twinCollection = new TwinCollection(Newtonsoft.Json.JsonConvert.SerializeObject(propertyDictionary));
+            }
+            return UpdateReportedPropertiesAsync(twinCollection, cts);
+
         }
 
         internal Task UpdatePropertyAsync(string propertyName, WritableProperty propertyValue, string componentName, CancellationToken cts)
         {
-            throw new NotImplementedException();
+            return UpdatePropertiesAsync(new Dictionary<string, object> { [propertyName] = propertyValue }, componentName, cts);
         }
 
-        internal Task SendTelemetryAsync(IDictionary<string, dynamic> telemetryDictionary, string componentName, IConventionHandler telemetrySerializer, CancellationToken cts)
+        internal Task SendTelemetryAsync(IDictionary<string, object> telemetryDictionary, string componentName, IConventionHandler telemetrySerializer, CancellationToken cts)
         {
-            if (telemetrySerializer == null)
-            {
-                telemetrySerializer = DefaultTelemetryConventionHandler.Instance;
-            }
-            using var telemetryMessage = new Message(telemetrySerializer.GetObjectBytes(telemetryDictionary));
-            return SendTelemetryAsync(telemetryMessage, componentName, telemetrySerializer, cts);
+            telemetrySerializer ??= DefaultConvention.Instance;
+            using var telemetryMessage = new Message(telemetrySerializer, telemetryDictionary);
+            return SendTelemetryAsync(telemetryMessage, componentName, cts);
         }
 
-        internal Task SendTelemetryAsync(Message telemetryMessage, string componentName, IConventionHandler telemetrySerializer, CancellationToken cts)
+        internal Task SendTelemetryAsync(Message telemetryMessage, string componentName, CancellationToken cts)
         {
-            if (telemetrySerializer == null)
-            {
-                telemetrySerializer = DefaultTelemetryConventionHandler.Instance;
-            }
-            telemetryMessage.ComponentName = componentName ?? string.Empty;
-            telemetryMessage.ContentType = telemetrySerializer?.ContentType ?? "application/json";
-            telemetryMessage.ContentEncoding = telemetrySerializer?.ContentEncoding.WebName ?? Encoding.UTF8.WebName;
-            return this.SendEventAsync(telemetryMessage, cts);
+            telemetryMessage.ComponentName ??= componentName;
+            telemetryMessage.ContentType ??= DefaultConvention.Instance.ContentType;
+            telemetryMessage.ContentEncoding ??= DefaultConvention.Instance?.ContentEncoding.WebName;
+            return SendEventAsync(telemetryMessage, cts);
         }
 
         internal Task SetCommandCallbackHandler(string commandName, Func<CommandRequest, object, Task<CommandResponse>> commandCallback, string componentName, object userContext, CancellationToken cts)
         {
-            throw new NotImplementedException();
+            commandName = string.IsNullOrEmpty(componentName) && string.IsNullOrWhiteSpace(componentName) ? commandName : $"{componentName}*{commandName}";
+
+            var methodCallback = new MethodCallback((methReq, context) =>
+            {
+                return Task.FromResult<MethodResponse>(commandCallback((CommandRequest)methReq, context).Result);
+            });
+            return SetMethodHandlerAsync(commandName, methodCallback, userContext, cts);
         }
 
         internal Task SetCommandCallbackHandler(Func<CommandRequest, object, Task<CommandResponse>> commandCallback, object userContext, CancellationToken cts)
         {
-            throw new NotImplementedException();
+            var methodCallback = new MethodCallback((methReq, context) =>
+            {
+                return Task.FromResult<MethodResponse>(commandCallback((CommandRequest)methReq, context).Result);
+            });
+            return SetMethodDefaultHandlerAsync(methodCallback, userContext, cts);
         }
 
         internal Task ListenToWritablePropertyEvent(object propertyCollection, object componentName, CancellationToken cancellationToken)

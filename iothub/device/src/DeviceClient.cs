@@ -701,8 +701,8 @@ namespace Microsoft.Azure.Devices.Client
         /// <param name="propertyValue"></param>
         /// <param name="componentName"></param>
         /// <param name="cancellationToken"></param>
-        public Task UpdatePropertyAsync(string propertyName, dynamic propertyValue, string componentName = default, CancellationToken cancellationToken = default)
-            => UpdatePropertiesAsync(new Dictionary<string, dynamic> { { propertyName, propertyValue } }, componentName, cancellationToken);
+        public Task UpdatePropertyAsync(string propertyName, object propertyValue, string componentName = default, CancellationToken cancellationToken = default)
+            => UpdatePropertiesAsync(new Dictionary<string, object> { { propertyName, propertyValue } }, componentName, cancellationToken);
 
         /// <summary>
         /// Update a collection of properties.
@@ -710,7 +710,7 @@ namespace Microsoft.Azure.Devices.Client
         /// <param name="properties">Reported properties to push</param>
         /// <param name="componentName"></param>
         /// <param name="cancellationToken"></param>
-        public Task UpdatePropertiesAsync(IDictionary<string, dynamic> properties, string componentName = default, CancellationToken cancellationToken = default)
+        public Task UpdatePropertiesAsync(IDictionary<string, object> properties, string componentName = default, CancellationToken cancellationToken = default)
             => InternalClient.UpdatePropertiesAsync(properties, componentName, cancellationToken);
 
         /// <summary>
@@ -730,9 +730,12 @@ namespace Microsoft.Azure.Devices.Client
         /// <param name="componentName"></param>
         /// <param name="cancellationToken"></param>
         public Task RespondToWritablePropertyEventAsync(IDictionary<string, WritableProperty> propertyCollection, string componentName = default, CancellationToken cancellationToken = default)
-            => InternalClient.UpdatePropertiesAsync((IDictionary<string, dynamic>)propertyCollection, componentName, cancellationToken);
+            => InternalClient.UpdatePropertiesAsync((IDictionary<string, object>)propertyCollection, componentName, cancellationToken);
 
         /// <summary>
+        /// ASK =====
+        /// ASK Do we want to keep the TwinCollection version of this?
+        /// ASK =====
         /// Respond to a writable property request.
         /// </summary>
         /// <param name="propertyCollection"></param>
@@ -761,8 +764,8 @@ namespace Microsoft.Azure.Devices.Client
         /// <remarks>
         /// This will create a single telemetry message and will not combine multiple calls into one message. Use <seealso cref="SendTelemetryAsync(IDictionary{string, dynamic}, string, IConventionHandler, CancellationToken)"/>. Refer to the documentation for <see cref="IConventionHandler"/> if you want to use a custom serializer.
         /// </remarks>
-        public Task SendTelemetryAsync(string telemetryName, dynamic telemetryValue, string componentName = default, IConventionHandler conventionHandler = default, CancellationToken cancellationToken = default)
-            => SendTelemetryAsync(new Dictionary<string, dynamic> { { telemetryName, telemetryValue } }, componentName, conventionHandler, cancellationToken);
+        public Task SendTelemetryAsync(string telemetryName, object telemetryValue, string componentName = default, IConventionHandler conventionHandler = default, CancellationToken cancellationToken = default)
+            => SendTelemetryAsync(new Dictionary<string, object> { { telemetryName, telemetryValue } }, componentName, conventionHandler, cancellationToken);
 
         /// <summary>
         /// Sends a collection of telemetry.
@@ -772,9 +775,9 @@ namespace Microsoft.Azure.Devices.Client
         /// <param name="conventionHandler">A convention handler that defines the content encoding and serializer to use for the telemetry message.</param>
         /// <param name="cancellationToken">A cancellation token.</param>
         /// /// <remarks>
-        /// This will either use the <see cref="DefaultTelemetryConventionHandler"/> to define the encoding and use the default Json serailzier. Refer to the documentation for <see cref="IConventionHandler"/> if you want to use a custom serializer.
+        /// This will either use the <see cref="DefaultConvention"/> to define the encoding and use the default Json serailzier. Refer to the documentation for <see cref="IConventionHandler"/> if you want to use a custom serializer.
         /// </remarks>
-        public Task SendTelemetryAsync(IDictionary<string, dynamic> telemetryDictionary, string componentName = default, IConventionHandler conventionHandler = default, CancellationToken cancellationToken = default)
+        public Task SendTelemetryAsync(IDictionary<string, object> telemetryDictionary, string componentName = default, IConventionHandler conventionHandler = default, CancellationToken cancellationToken = default)
             => InternalClient.SendTelemetryAsync(telemetryDictionary, componentName, conventionHandler, cancellationToken);
 
         /// <summary>
@@ -782,11 +785,10 @@ namespace Microsoft.Azure.Devices.Client
         /// </summary>
         /// <param name="telemetryMessage">The </param>
         /// <param name="componentName">The component name this telemetry belongs to.</param>
-        /// <param name="conventionHandler">A convention handler that defines the content encoding and serializer to use for the telemetry message.</param>
         /// <param name="cancellationToken">A cancellation token.</param>
 #pragma warning disable CA1062 // Validate arguments of public methods
-        public Task SendTelemetryAsync(Message telemetryMessage, string componentName = default, IConventionHandler conventionHandler = default, CancellationToken cancellationToken = default)
-            => InternalClient.SendTelemetryAsync(telemetryMessage, componentName, conventionHandler, cancellationToken);
+        public Task SendTelemetryAsync(Message telemetryMessage, string componentName = default, CancellationToken cancellationToken = default)
+            => InternalClient.SendTelemetryAsync(telemetryMessage, componentName, cancellationToken);
 #pragma warning restore CA1062 // Validate arguments of public methods
 
         /// <summary>

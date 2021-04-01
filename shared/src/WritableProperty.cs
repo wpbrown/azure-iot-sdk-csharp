@@ -16,7 +16,7 @@ namespace Microsoft.Azure.Devices.Shared
         /// <param name="valueToConvert"></param>
         /// <param name="ackCode"></param>
         /// <param name="ackVersion"></param>
-        public WritableProperty(dynamic valueToConvert, int ackCode, int ackVersion)
+        public WritableProperty(object valueToConvert, int ackCode, int ackVersion)
         {
             Value = valueToConvert;
             AckCode = ackCode;
@@ -26,7 +26,7 @@ namespace Microsoft.Azure.Devices.Shared
         /// <summary>
         /// The payload for this writable telemetry.
         /// </summary>
-        public dynamic Value { get; set; }
+        public object Value { get; set; }
 
         /// <summary>
         /// The acknowledgement code, usually an HTTP Status Code e.g. 200, 400.

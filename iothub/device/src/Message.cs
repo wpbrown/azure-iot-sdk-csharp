@@ -64,6 +64,43 @@ namespace Microsoft.Azure.Devices.Client
         }
 
         /// <summary>
+        /// Constructor which uses a custom defined <see cref="IConventionHandler"/> to serialize the message payload passed in as an object.
+        /// </summary>
+        /// <remarks>When using <see cref="IConventionHandler"/> the creator of the class is responsible for all encoding and serialization</remarks>
+        /// <param name="messageConventionHandler">A byte array which will be used to form the body stream.</param>
+        /// <param name="messagePayload"></param>
+        public Message(IConventionHandler messageConventionHandler, object messagePayload)
+            : this(new MemoryStream(messageConventionHandler?.GetObjectBytes(messagePayload)))
+        {
+            if (messageConventionHandler is null)
+            {
+                throw new ArgumentNullException(nameof(messageConventionHandler));
+            }
+
+            if (messagePayload is null)
+            {
+                throw new ArgumentNullException(nameof(messagePayload));
+            }
+
+            // Use the content encoding and type from the convention handler
+            ContentEncoding = messageConventionHandler.ContentEncoding.WebName;
+            ContentType = messageConventionHandler.ContentType;
+
+            // Reset the owning of the stream
+            _streamDisposalResponsibility = StreamDisposalResponsibility.Sdk;
+        }
+
+        /// <summary>
+        /// Constructor which uses the <see cref="DefaultTelemetryConventionHandler"/> to serialize the message payload passed in as an object.
+        /// </summary>
+        /// <remarks>The <see cref="DefaultTelemetryConventionHandler"/> will encode the message using the <see cref="Newtonsoft.Json.JsonConvert.SerializeObject(object?)"/> method to serialize your object. Please ensure the object(s) to be serialized are handled correctly.</remarks>
+        /// <param name="messagePayload"></param>
+        public Message(object messagePayload)
+            : this(DefaultTelemetryConventionHandler.Instance, messagePayload)
+        {
+        }
+
+        /// <summary>
         /// This constructor is only used on the Gateway HTTP path so that we can clean up the stream.
         /// </summary>
         /// <param name="stream">A stream which will be used as body stream.</param>
