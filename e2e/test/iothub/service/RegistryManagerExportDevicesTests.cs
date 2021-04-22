@@ -46,9 +46,10 @@ namespace Microsoft.Azure.Devices.E2ETests.Iothub.Service
         [TestCategory("LongRunning")]
         [Timeout(120000)]
         [DoNotParallelize]
-        [DataRow(StorageAuthenticationType.KeyBased)]
-        [DataRow(StorageAuthenticationType.IdentityBased)]
-        public async Task RegistryManager_ExportDevices(StorageAuthenticationType storageAuthenticationType)
+        [DataRow(StorageAuthenticationType.KeyBased, false)]
+        [DataRow(StorageAuthenticationType.IdentityBased, false)]
+        // [DataRow(StorageAuthenticationType.IdentityBased, true)] - Enable once service turns on ff.
+        public async Task RegistryManager_ExportDevices(StorageAuthenticationType storageAuthenticationType, bool isUserAssignedMsi)
         {
             // arrange
 
@@ -86,13 +87,25 @@ namespace Microsoft.Azure.Devices.E2ETests.Iothub.Service
                 {
                     try
                     {
+                        ManagedIdentity identity = null;
+                        if (isUserAssignedMsi)
+                        {
+                            // TODO: Configuration.IoTHub.UserAssignedMsiResourceId environment variable
+                            var userAssignedMsiResourceId = "";
+                            identity = new ManagedIdentity
+                            {
+                                userAssignedIdentity = userAssignedMsiResourceId
+                            };
+                        }
+
                         exportJobResponse = await registryManager
                            .ExportDevicesAsync(
                                 JobProperties.CreateForExportJob(
                                     containerUri.ToString(),
                                     true,
                                     null,
-                                    storageAuthenticationType))
+                                    storageAuthenticationType,
+                                    identity))
                            .ConfigureAwait(false);
                         break;
                     }
